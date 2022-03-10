@@ -3,78 +3,46 @@
  *
  * @module Chartist.Core
  */
-var Chartist = {
-  version: '<%= pkg.version %>'
-};
 
-(function (globalRoot, Chartist) {
-  'use strict';
+class Chartist {
 
-  var window = globalRoot.window;
-  var document = globalRoot.document;
+  /**
+   * Precision level used internally in Chartist for rounding. If you require more decimal places you can increase this number.
+   *
+   * @memberof Chartist.Core
+   * @type {number}
+   */
+  static precision = 8;
 
+  /**
+   * A map with characters to escape for strings to be safely used as attribute values.
+   *
+   * @memberof Chartist.Core
+   * @type {Object}
+   */
+  static escapingMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    '\'': '&#039;'
+  };
+
+  static version = '<%= pkg.version %>';
+
+  // noinspection HttpUrlsUsage
   /**
    * This object contains all namespaces used within Chartist.
    *
    * @memberof Chartist.Core
    * @type {{svg: string, xmlns: string, xhtml: string, xlink: string, ct: string}}
    */
-  Chartist.namespaces = {
+  static namespaces = {
     svg: 'http://www.w3.org/2000/svg',
     xmlns: 'http://www.w3.org/2000/xmlns/',
     xhtml: 'http://www.w3.org/1999/xhtml',
     xlink: 'http://www.w3.org/1999/xlink',
     ct: 'http://gionkunz.github.com/chartist-js/ct'
-  };
-
-  /**
-   * Helps to simplify functional style code
-   *
-   * @memberof Chartist.Core
-   * @param {*} n This exact value will be returned by the noop function
-   * @return {*} The same value that was provided to the n parameter
-   */
-  Chartist.noop = function (n) {
-    return n;
-  };
-
-  /**
-   * Generates a-z from a number 0 to 26
-   *
-   * @memberof Chartist.Core
-   * @param {Number} n A number from 0 to 26 that will result in a letter a-z
-   * @return {String} A character from a-z based on the input number n
-   */
-  Chartist.alphaNumerate = function (n) {
-    // Limit to a-z
-    return String.fromCharCode(97 + n % 26);
-  };
-
-  /**
-   * Simple recursive object extend
-   *
-   * @memberof Chartist.Core
-   * @param {Object} target Target object where the source will be merged into
-   * @param {Object...} sources This object (objects) will be merged into target and then target is returned
-   * @return {Object} An object that has the same reference as target but is extended and merged with the properties of source
-   */
-  Chartist.extend = function (target) {
-    var i, source, sourceProp;
-    target = target || {};
-
-    for (i = 1; i < arguments.length; i++) {
-      source = arguments[i];
-      for (var prop in source) {
-        sourceProp = source[prop];
-        if (typeof sourceProp === 'object' && sourceProp !== null && !(sourceProp instanceof Array)) {
-          target[prop] = Chartist.extend(target[prop], sourceProp);
-        } else {
-          target[prop] = sourceProp;
-        }
-      }
-    }
-
-    return target;
   };
 
   /**
@@ -86,9 +54,9 @@ var Chartist = {
    * @param {String} newSubStr
    * @return {String}
    */
-  Chartist.replaceAll = function(str, subStr, newSubStr) {
+  static replaceAll(str, subStr, newSubStr) {
     return str.replace(new RegExp(subStr, 'g'), newSubStr);
-  };
+  }
 
   /**
    * Converts a number to a string with a unit. If a string is passed then this will be returned unmodified.
@@ -98,13 +66,13 @@ var Chartist = {
    * @param {String} unit
    * @return {String} Returns the passed number value with unit.
    */
-  Chartist.ensureUnit = function(value, unit) {
-    if(typeof value === 'number') {
-      value = value + unit;
+  static ensureUnit(value, unit) {
+    if (typeof value === 'number') {
+      return value.toString() + unit;
     }
 
-    return value;
-  };
+    return value.toString();
+  }
 
   /**
    * Converts a number or string to a quantity object.
@@ -113,16 +81,16 @@ var Chartist = {
    * @param {String|Number} input
    * @return {Object} Returns an object containing the value as number and the unit as string.
    */
-  Chartist.quantity = function(input) {
+  static quantity(input) {
     if (typeof input === 'string') {
-      var match = (/^(\d+)\s*(.*)$/g).exec(input);
+      let match = (/^(\d+)\s*(.*)$/g).exec(input);
       return {
         value : +match[1],
         unit: match[2] || undefined
       };
     }
     return { value: input };
-  };
+  }
 
   /**
    * This is a wrapper around document.querySelector that will return the query if it's already of type Node
@@ -131,9 +99,9 @@ var Chartist = {
    * @param {String|Node} query The query to use for selecting a Node or a DOM node that will be returned directly
    * @return {Node}
    */
-  Chartist.querySelector = function(query) {
+  static querySelector(query) {
     return query instanceof Node ? query : document.querySelector(query);
-  };
+  }
 
   /**
    * Functional style helper to produce array with given length initialized with undefined values
@@ -142,9 +110,9 @@ var Chartist = {
    * @param length
    * @return {Array}
    */
-  Chartist.times = function(length) {
+  static times(length) {
     return Array.apply(null, new Array(length));
-  };
+  }
 
   /**
    * Sum helper to be used in reduce functions
@@ -154,9 +122,9 @@ var Chartist = {
    * @param current
    * @return {*}
    */
-  Chartist.sum = function(previous, current) {
+  static sum(previous, current) {
     return previous + (current ? current : 0);
-  };
+  }
 
   /**
    * Multiply helper to be used in `Array.map` for multiplying each value of an array with a factor.
@@ -165,41 +133,41 @@ var Chartist = {
    * @param {Number} factor
    * @returns {Function} Function that can be used in `Array.map` to multiply each value in an array
    */
-  Chartist.mapMultiply = function(factor) {
+  static mapMultiply(factor) {
     return function(num) {
       return num * factor;
     };
-  };
+  }
 
   /**
-   * Add helper to be used in `Array.map` for adding a addend to each value of an array.
+   * Add helper to be used in `Array.map` for adding an addend to each value of an array.
    *
    * @memberof Chartist.Core
    * @param {Number} addend
-   * @returns {Function} Function that can be used in `Array.map` to add a addend to each value in an array
+   * @returns {Function} Function that can be used in `Array.map` to add an addend to each value in an array
    */
-  Chartist.mapAdd = function(addend) {
+  static mapAdd(addend) {
     return function(num) {
       return num + addend;
     };
-  };
+  }
 
   /**
-   * Map for multi dimensional arrays where their nested arrays will be mapped in serial. The output array will have the length of the largest nested array. The callback function is called with variable arguments where each argument is the nested array value (or undefined if there are no more values).
+   * Map for multidimensional arrays where their nested arrays will be mapped in serial. The output array will have the length of the largest nested array. The callback function is called with variable arguments where each argument is the nested array value (or undefined if there are no more values).
    *
    * @memberof Chartist.Core
    * @param arr
    * @param cb
    * @return {Array}
    */
-  Chartist.serialMap = function(arr, cb) {
-    var result = [],
-        length = Math.max.apply(null, arr.map(function(e) {
-          return e.length;
-        }));
+  static serialMap(arr, cb) {
+    let result = [],
+      length = Math.max.apply(null, arr.map(function(e) {
+        return e.length;
+      }));
 
     Chartist.times(length).forEach(function(e, index) {
-      var args = arr.map(function(e) {
+      let args = arr.map(function(e) {
         return e[index];
       });
 
@@ -207,7 +175,7 @@ var Chartist = {
     });
 
     return result;
-  };
+  }
 
   /**
    * This helper function can be used to round values with certain precision level after decimal. This is used to prevent rounding errors near float point precision limit.
@@ -217,32 +185,61 @@ var Chartist = {
    * @param {Number} [digits] The number of digits after decimal used to do the rounding
    * @returns {number} Rounded value
    */
-  Chartist.roundWithPrecision = function(value, digits) {
-    var precision = Math.pow(10, digits || Chartist.precision);
+  static roundWithPrecision(value, digits) {
+    let precision = Math.pow(10, digits || Chartist.precision);
     return Math.round(value * precision) / precision;
-  };
+  }
 
   /**
-   * Precision level used internally in Chartist for rounding. If you require more decimal places you can increase this number.
+   * Helps to simplify functional style code
    *
    * @memberof Chartist.Core
-   * @type {number}
+   * @param {*} n This exact value will be returned by the noop function
+   * @return {*} The same value that was provided to the n parameter
    */
-  Chartist.precision = 8;
+  static noop(n) {
+    return n;
+  }
 
   /**
-   * A map with characters to escape for strings to be safely used as attribute values.
+   * Generates a-z from a number 0 to 26
    *
    * @memberof Chartist.Core
-   * @type {Object}
+   * @param {Number} n A number from 0 to 26 that will result in a letter a-z
+   * @return {String} A character from a-z based on the input number n
    */
-  Chartist.escapingMap = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    '\'': '&#039;'
-  };
+  static alphaNumerate(n) {
+    // Limit to a-z
+    return String.fromCharCode(97 + n % 26);
+  }
+
+  // noinspection JSClosureCompilerSyntax,JSCommentMatchesSignature
+  /**
+   * Simple recursive object extend
+   *
+   * @memberof Chartist.Core
+   * @param {Object} target Target object where the source will be merged into
+   * @param {Object...} sources This object (objects) will be merged into target and then target is returned
+   * @return {Object} An object that has the same reference as target but is extended and merged with the properties of source
+   */
+  static extend(target) {
+    let i, source, sourceProp;
+    target = target || {};
+
+    for (i = 1; i < arguments.length; i++) {
+      source = arguments[i];
+      for (let prop in source) {
+        sourceProp = source[prop];
+        if (typeof sourceProp === 'object' && sourceProp !== null && !(sourceProp instanceof Array)) {
+          target[prop] = Chartist.extend(target[prop], sourceProp);
+        } else {
+          target[prop] = sourceProp;
+        }
+      }
+    }
+
+    return target;
+  }
 
   /**
    * This function serializes arbitrary data to a string. In case of data that can't be easily converted to a string, this function will create a wrapper object and serialize the data using JSON.stringify. The outcoming string will always be escaped using Chartist.escapingMap.
@@ -252,19 +249,19 @@ var Chartist = {
    * @param {Number|String|Object} data
    * @return {String}
    */
-  Chartist.serialize = function(data) {
-    if(data === null || data === undefined) {
+  static serialize(data) {
+    if (data === null || data === undefined) {
       return data;
-    } else if(typeof data === 'number') {
-      data = ''+data;
-    } else if(typeof data === 'object') {
+    } else if (typeof data === 'number') {
+      data = '' + data;
+    } else if (typeof data === 'object') {
       data = JSON.stringify({data: data});
     }
 
-    return Object.keys(Chartist.escapingMap).reduce(function(result, key) {
-      return Chartist.replaceAll(result, key, Chartist.escapingMap[key]);
-    }, data);
-  };
+    return Object.keys(Chartist.escapingMap).reduce(function (result, key) {
+      return Chartist.replaceAll(result.toString(), key, Chartist.escapingMap[key]);
+    }, data).toString();
+  }
 
   /**
    * This function de-serializes a string previously serialized with Chartist.serialize. The string will always be unescaped using Chartist.escapingMap before it's returned. Based on the input value the return type can be Number, String or Object. JSON.parse is used with try / catch to see if the unescaped string can be parsed into an Object and this Object will be returned on success.
@@ -273,22 +270,24 @@ var Chartist = {
    * @param {String} data
    * @return {String|Number|Object}
    */
-  Chartist.deserialize = function(data) {
-    if(typeof data !== 'string') {
+  static deserialize(data) {
+    if (typeof data !== 'string') {
       return data;
     }
 
-    data = Object.keys(Chartist.escapingMap).reduce(function(result, key) {
+    data = Object.keys(Chartist.escapingMap).reduce(function (result, key) {
       return Chartist.replaceAll(result, Chartist.escapingMap[key], key);
     }, data);
 
     try {
       data = JSON.parse(data);
+      // noinspection JSUnresolvedVariable
       data = data.data !== undefined ? data.data : data;
-    } catch(e) {}
+    } catch (e) {
+    }
 
     return data;
-  };
+  }
 
   /**
    * Create or reinitialize the SVG element for the chart
@@ -300,14 +299,15 @@ var Chartist = {
    * @param {String} className Specify a class to be added to the SVG element
    * @return {Object} The created/reinitialized SVG element
    */
-  Chartist.createSvg = function (container, width, height, className) {
-    var svg;
+  static createSvg(container, width, height, className) {
+    let svg;
 
     width = width || '100%';
     height = height || '100%';
 
     // Check if there is a previous SVG element in the container that contains the Chartist XML namespace and remove it
     // Since the DOM API does not support namespaces we need to manually search the returned list http://www.w3.org/TR/selectors-api/
+    // noinspection JSUnresolvedFunction
     Array.prototype.slice.call(container.querySelectorAll('svg')).filter(function filterChartistSvgObjects(svg) {
       return svg.getAttributeNS(Chartist.namespaces.xmlns, 'ct');
     }).forEach(function removePreviousElement(svg) {
@@ -327,17 +327,19 @@ var Chartist = {
     container.appendChild(svg._node);
 
     return svg;
-  };
+  }
 
   /**
    * Ensures that the data object passed as second argument to the charts is present and correctly initialized.
    *
    * @param  {Object} data The data object that is passed as second argument to the charts
+   * @param {Boolean} [reverse] If true the whole data is reversed by the getDataArray call. This will modify the data object passed as first parameter. The labels as well as the series order is reversed. The whole series data arrays are reversed too.
+   * @param {Boolean} [multi] Create a multidimensional array from a series data array where a value object with `x` and `y` values will be created.
    * @return {Object} The normalized data object
    */
-  Chartist.normalizeData = function(data, reverse, multi) {
-    var labelCount;
-    var output = {
+  static normalizeData(data, reverse, multi) {
+    let labelCount;
+    let output = {
       raw: data,
       normalized: {}
     };
@@ -348,16 +350,16 @@ var Chartist = {
     }, reverse, multi);
 
     // If all elements of the normalized data array are arrays we're dealing with
-    // multi series data and we need to find the largest series if they are un-even
-    if (output.normalized.series.every(function(value) {
-        return value instanceof Array;
-      })) {
-      // Getting the series with the the most elements
-      labelCount = Math.max.apply(null, output.normalized.series.map(function(series) {
+    // multi series data, we need to find the largest series if they are un-even
+    if (output.normalized.series.every(function (value) {
+      return value instanceof Array;
+    })) {
+      // Getting the series with the most elements
+      labelCount = Math.max.apply(null, output.normalized.series.map(function (series) {
         return series.length;
       }));
     } else {
-      // We're dealing with Pie data so we just take the normalized array length
+      // We're dealing with Pie data, so we just take the normalized array length
       labelCount = output.normalized.series.length;
     }
 
@@ -365,17 +367,17 @@ var Chartist = {
     // Padding the labels to labelCount with empty strings
     Array.prototype.push.apply(
       output.normalized.labels,
-      Chartist.times(Math.max(0, labelCount - output.normalized.labels.length)).map(function() {
+      Chartist.times(Math.max(0, labelCount - output.normalized.labels.length)).map(function () {
         return '';
       })
     );
 
-    if(reverse) {
+    if (reverse) {
       Chartist.reverseData(output.normalized);
     }
 
     return output;
-  };
+  }
 
   /**
    * This function safely checks if an objects has an owned property.
@@ -384,11 +386,11 @@ var Chartist = {
    * @param {string} property The property name
    * @returns {boolean} Returns true if the object owns the specified property
    */
-  Chartist.safeHasProperty = function(object, property) {
+  static safeHasProperty(object, property) {
     return object !== null &&
       typeof object === 'object' &&
       object.hasOwnProperty(property);
-  };
+  }
 
   /**
    * Checks if a value is considered a hole in the data series.
@@ -396,11 +398,11 @@ var Chartist = {
    * @param {*} value
    * @returns {boolean} True if the value is considered a data hole
    */
-  Chartist.isDataHoleValue = function(value) {
+  static isDataHoleValue(value) {
     return value === null ||
       value === undefined ||
       (typeof value === 'number' && isNaN(value));
-  };
+  }
 
   /**
    * Reverses the series, labels and series data arrays.
@@ -408,17 +410,17 @@ var Chartist = {
    * @memberof Chartist.Core
    * @param data
    */
-  Chartist.reverseData = function(data) {
+  static reverseData(data) {
     data.labels.reverse();
     data.series.reverse();
-    for (var i = 0; i < data.series.length; i++) {
-      if(typeof(data.series[i]) === 'object' && data.series[i].data !== undefined) {
+    for (let i = 0; i < data.series.length; i++) {
+      if (typeof (data.series[i]) === 'object' && data.series[i].data !== undefined) {
         data.series[i].data.reverse();
-      } else if(data.series[i] instanceof Array) {
+      } else if (data.series[i] instanceof Array) {
         data.series[i].reverse();
       }
     }
-  };
+  }
 
   /**
    * Convert data series into plain array
@@ -426,35 +428,35 @@ var Chartist = {
    * @memberof Chartist.Core
    * @param {Object} data The series object that contains the data to be visualized in the chart
    * @param {Boolean} [reverse] If true the whole data is reversed by the getDataArray call. This will modify the data object passed as first parameter. The labels as well as the series order is reversed. The whole series data arrays are reversed too.
-   * @param {Boolean} [multi] Create a multi dimensional array from a series data array where a value object with `x` and `y` values will be created.
+   * @param {Boolean} [multi] Create a multidimensional array from a series data array where a value object with `x` and `y` values will be created.
    * @return {Array} A plain array that contains the data to be visualized in the chart
    */
-  Chartist.getDataArray = function(data, reverse, multi) {
-    // Recursively walks through nested arrays and convert string values to numbers and objects with value properties
+  static getDataArray(data, reverse, multi) {
+    // Recursively walks through nested arrays and convert string values to number and objects with value properties
     // to values. Check the tests in data core -> data normalization for a detailed specification of expected values
     function recursiveConvert(value) {
-      if(Chartist.safeHasProperty(value, 'value')) {
-        // We are dealing with value object notation so we need to recurse on value property
+      if (Chartist.safeHasProperty(value, 'value')) {
+        // We are dealing with value object notation, so we need to recurse on value property
         return recursiveConvert(value.value);
-      } else if(Chartist.safeHasProperty(value, 'data')) {
-        // We are dealing with series object notation so we need to recurse on data property
+      } else if (Chartist.safeHasProperty(value, 'data')) {
+        // We are dealing with series object notation, so we need to recurse on data property
         return recursiveConvert(value.data);
-      } else if(value instanceof Array) {
-        // Data is of type array so we need to recurse on the series
+      } else if (value instanceof Array) {
+        // Data is of type array, so we need to recurse on the series
         return value.map(recursiveConvert);
-      } else if(Chartist.isDataHoleValue(value)) {
+      } else if (Chartist.isDataHoleValue(value)) {
         // We're dealing with a hole in the data and therefore need to return undefined
         // We're also returning undefined for multi value output
         return undefined;
       } else {
         // We need to prepare multi value output (x and y data)
-        if(multi) {
-          var multiValue = {};
+        if (multi) {
+          let multiValue = {};
 
           // Single series value arrays are assumed to specify the Y-Axis value
           // For example: [1, 2] => [{x: undefined, y: 1}, {x: undefined, y: 2}]
           // If multi is a string then it's assumed that it specified which dimension should be filled as default
-          if(typeof multi === 'string') {
+          if (typeof multi === 'string') {
             multiValue[multi] = Chartist.getNumberOrUndefined(value);
           } else {
             multiValue.y = Chartist.getNumberOrUndefined(value);
@@ -473,17 +475,17 @@ var Chartist = {
     }
 
     return data.series.map(recursiveConvert);
-  };
+  }
 
   /**
    * Converts a number into a padding object.
    *
    * @memberof Chartist.Core
    * @param {Object|Number} padding
-   * @param {Number} [fallback] This value is used to fill missing values if a incomplete padding object was passed
+   * @param {Number} [fallback] This value is used to fill missing values if an incomplete padding object was passed
    * @returns {Object} Returns a padding object containing top, right, bottom, left properties filled with the padding number passed in as argument. If the argument is something else than a number (presumably already a correct padding object) then this argument is directly returned.
    */
-  Chartist.normalizePadding = function(padding, fallback) {
+  static normalizePadding(padding, fallback) {
     fallback = fallback || 0;
 
     return typeof padding === 'number' ? {
@@ -497,12 +499,12 @@ var Chartist = {
       bottom: typeof padding.bottom === 'number' ? padding.bottom : fallback,
       left: typeof padding.left === 'number' ? padding.left : fallback
     };
-  };
+  }
 
-  Chartist.getMetaData = function(series, index) {
-    var value = series.data ? series.data[index] : series[index];
+  static getMetaData(series, index) {
+    let value = series.data ? series.data[index] : series[index];
     return value ? value.meta : undefined;
-  };
+  }
 
   /**
    * Calculate the order of magnitude for the chart scale
@@ -511,9 +513,9 @@ var Chartist = {
    * @param {Number} value The value Range of the chart
    * @return {Number} The order of magnitude
    */
-  Chartist.orderOfMagnitude = function (value) {
+  static orderOfMagnitude(value) {
     return Math.floor(Math.log(Math.abs(value)) / Math.LN10);
-  };
+  }
 
   /**
    * Project a data length into screen coordinates (pixels)
@@ -524,9 +526,9 @@ var Chartist = {
    * @param {Object} bounds All the values to set the bounds of the chart
    * @return {Number} The projected data length in pixels
    */
-  Chartist.projectLength = function (axisLength, length, bounds) {
+  static projectLength(axisLength, length, bounds) {
     return length / bounds.range * axisLength;
-  };
+  }
 
   /**
    * Get the height of the area in the chart for the data series
@@ -536,9 +538,9 @@ var Chartist = {
    * @param {Object} options The Object that contains all the optional values for the chart
    * @return {Number} The height of the area in the chart for the data series
    */
-  Chartist.getAvailableHeight = function (svg, options) {
+  static getAvailableHeight(svg, options) {
     return Math.max((Chartist.quantity(options.height).value || svg.height()) - (options.chartPadding.top +  options.chartPadding.bottom) - options.axisX.offset, 0);
-  };
+  }
 
   /**
    * Get highest and lowest value of data array. This Array contains the data that will be visualized in the chart.
@@ -549,27 +551,27 @@ var Chartist = {
    * @param {String} dimension Axis dimension 'x' or 'y' used to access the correct value and high / low configuration
    * @return {Object} An object that contains the highest and lowest value that will be visualized on the chart.
    */
-  Chartist.getHighLow = function (data, options, dimension) {
+  static getHighLow(data, options, dimension) {
     // TODO: Remove workaround for deprecated global high / low config. Axis high / low configuration is preferred
     options = Chartist.extend({}, options, dimension ? options['axis' + dimension.toUpperCase()] : {});
 
-    var highLow = {
-        high: options.high === undefined ? -Number.MAX_VALUE : +options.high,
-        low: options.low === undefined ? Number.MAX_VALUE : +options.low
-      };
-    var findHigh = options.high === undefined;
-    var findLow = options.low === undefined;
+    let highLow = {
+      high: options.high === undefined ? -Number.MAX_VALUE : +options.high,
+      low: options.low === undefined ? Number.MAX_VALUE : +options.low
+    };
+    let findHigh = options.high === undefined;
+    let findLow = options.low === undefined;
 
     // Function to recursively walk through arrays and find highest and lowest number
     function recursiveHighLow(data) {
-      if(data === undefined) {
+      if (data === undefined) {
         return undefined;
-      } else if(data instanceof Array) {
-        for (var i = 0; i < data.length; i++) {
+      } else if (data instanceof Array) {
+        for (let i = 0; i < data.length; i++) {
           recursiveHighLow(data[i]);
         }
       } else {
-        var value = dimension ? +data[dimension] : +data;
+        let value = dimension ? +data[dimension] : +data;
 
         if (findHigh && value > highLow.high) {
           highLow.high = value;
@@ -582,7 +584,7 @@ var Chartist = {
     }
 
     // Start to find highest and lowest number recursively
-    if(findHigh || findLow) {
+    if (findHigh || findLow) {
       recursiveHighLow(data);
     }
 
@@ -614,7 +616,7 @@ var Chartist = {
     }
 
     return highLow;
-  };
+  }
 
   /**
    * Checks if a value can be safely coerced to a number. This includes all values except null which result in finite numbers when coerced. This excludes NaN, since it's not finite.
@@ -623,20 +625,21 @@ var Chartist = {
    * @param value
    * @returns {Boolean}
    */
-  Chartist.isNumeric = function(value) {
+  static isNumeric(value) {
     return value === null ? false : isFinite(value);
-  };
+  }
 
+  // noinspection SpellCheckingInspection
   /**
-   * Returns true on all falsey values except the numeric value 0.
+   * Returns true on all false values except the numeric value 0.
    *
    * @memberof Chartist.Core
    * @param value
    * @returns {boolean}
    */
-  Chartist.isFalseyButZero = function(value) {
+  static isFalseyButZero(value) {
     return !value && value !== 0;
-  };
+  }
 
   /**
    * Returns a number if the passed parameter is a valid number or the function will return undefined. On all other values than a valid number, this function will return undefined.
@@ -645,9 +648,9 @@ var Chartist = {
    * @param value
    * @returns {*}
    */
-  Chartist.getNumberOrUndefined = function(value) {
+  static getNumberOrUndefined(value) {
     return Chartist.isNumeric(value) ? +value : undefined;
-  };
+  }
 
   /**
    * Checks if provided value object is multi value (contains x or y properties)
@@ -655,36 +658,35 @@ var Chartist = {
    * @memberof Chartist.Core
    * @param value
    */
-  Chartist.isMultiValue = function(value) {
+  static isMultiValue(value) {
     return typeof value === 'object' && ('x' in value || 'y' in value);
-  };
+  }
 
   /**
-   * Gets a value from a dimension `value.x` or `value.y` while returning value directly if it's a valid numeric value. If the value is not numeric and it's falsey this function will return `defaultValue`.
+   * Gets a value from a dimension `value.x` or `value.y` while returning value directly if it's a valid numeric value. If the value is not numeric, and it's falsey this function will return `defaultValue`.
    *
    * @memberof Chartist.Core
    * @param value
    * @param dimension
-   * @param defaultValue
    * @returns {*}
    */
-  Chartist.getMultiValue = function(value, dimension) {
-    if(Chartist.isMultiValue(value)) {
+  static getMultiValue(value, dimension) {
+    if (Chartist.isMultiValue(value)) {
       return Chartist.getNumberOrUndefined(value[dimension || 'y']);
     } else {
       return Chartist.getNumberOrUndefined(value);
     }
-  };
+  }
 
   /**
-   * Pollard Rho Algorithm to find smallest factor of an integer value. There are more efficient algorithms for factorization, but this one is quite efficient and not so complex.
+   * Pollard Rho Algorithm to find the smallest factor of an integer value. There are more efficient algorithms for factorization, but this one is quite efficient and not so complex.
    *
    * @memberof Chartist.Core
    * @param {Number} num An integer number where the smallest factor should be searched for
    * @returns {Number} The smallest integer factor of the parameter num.
    */
-  Chartist.rho = function(num) {
-    if(num === 1) {
+  static rho(num) {
+    if (num === 1) {
       return num;
     }
 
@@ -700,7 +702,7 @@ var Chartist = {
       return x * x + 1;
     }
 
-    var x1 = 2, x2 = 2, divisor;
+    let x1 = 2, x2 = 2, divisor;
     if (num % 2 === 0) {
       return 2;
     }
@@ -712,7 +714,7 @@ var Chartist = {
     } while (divisor === 1);
 
     return divisor;
-  };
+  }
 
   /**
    * Calculate and retrieve all the bounds for the chart and return them in one array
@@ -724,8 +726,8 @@ var Chartist = {
    * @param {Boolean} onlyInteger
    * @return {Object} All the values to set the bounds of the chart
    */
-  Chartist.getBounds = function (axisLength, highLow, scaleMinSpace, onlyInteger) {
-    var i,
+  static getBounds(axisLength, highLow, scaleMinSpace, onlyInteger) {
+    let i,
       optimizationCounter = 0,
       newMin,
       newMax,
@@ -744,16 +746,16 @@ var Chartist = {
 
     // Optimize scale step by checking if subdivision is possible based on horizontalGridMinSpace
     // If we are already below the scaleMinSpace value we will scale up
-    var length = Chartist.projectLength(axisLength, bounds.step, bounds);
-    var scaleUp = length < scaleMinSpace;
-    var smallestFactor = onlyInteger ? Chartist.rho(bounds.range) : 0;
+    let length = Chartist.projectLength(axisLength, bounds.step, bounds);
+    let scaleUp = length < scaleMinSpace;
+    let smallestFactor = onlyInteger ? Chartist.rho(bounds.range) : 0;
 
-    // First check if we should only use integer steps and if step 1 is still larger than scaleMinSpace so we can use 1
-    if(onlyInteger && Chartist.projectLength(axisLength, 1, bounds) >= scaleMinSpace) {
+    // First check if we should only use integer steps and if step 1 is still larger than scaleMinSpace, so we can use 1
+    if (onlyInteger && Chartist.projectLength(axisLength, 1, bounds) >= scaleMinSpace) {
       bounds.step = 1;
-    } else if(onlyInteger && smallestFactor < bounds.step && Chartist.projectLength(axisLength, smallestFactor, bounds) >= scaleMinSpace) {
+    } else if (onlyInteger && smallestFactor < bounds.step && Chartist.projectLength(axisLength, smallestFactor, bounds) >= scaleMinSpace) {
       // If step 1 was too small, we can try the smallest factor of range
-      // If the smallest factor is smaller than the current bounds.step and the projected length of smallest factor
+      // If the smallest factor is smaller than the current bounds.step and the projected length of the smallest factor
       // is larger than the scaleMinSpace we should go for it.
       bounds.step = smallestFactor;
     } else {
@@ -763,7 +765,7 @@ var Chartist = {
           bounds.step *= 2;
         } else if (!scaleUp && Chartist.projectLength(axisLength, bounds.step / 2, bounds) >= scaleMinSpace) {
           bounds.step /= 2;
-          if(onlyInteger && bounds.step % 1 !== 0) {
+          if (onlyInteger && bounds.step % 1 !== 0) {
             bounds.step *= 2;
             break;
           }
@@ -771,18 +773,19 @@ var Chartist = {
           break;
         }
 
-        if(optimizationCounter++ > 1000) {
+        if (optimizationCounter++ > 1000) {
           throw new Error('Exceeded maximum number of iterations while optimizing scale step!');
         }
       }
     }
 
-    var EPSILON = 2.221E-16;
+    let EPSILON = 2.221E-16;
     bounds.step = Math.max(bounds.step, EPSILON);
+
     function safeIncrement(value, increment) {
-      // If increment is too small use *= (1+EPSILON) as a simple nextafter
+      // If increment is too small use *= (1+EPSILON) as a simple next-after
       if (value === (value += increment)) {
-      	value *= (1 + (increment > 0 ? EPSILON : -EPSILON));
+        value *= (1 + (increment > 0 ? EPSILON : -EPSILON));
       }
       return value;
     }
@@ -791,25 +794,25 @@ var Chartist = {
     newMin = bounds.min;
     newMax = bounds.max;
     while (newMin + bounds.step <= bounds.low) {
-    	newMin = safeIncrement(newMin, bounds.step);
+      newMin = safeIncrement(newMin, bounds.step);
     }
     while (newMax - bounds.step >= bounds.high) {
-    	newMax = safeIncrement(newMax, -bounds.step);
+      newMax = safeIncrement(newMax, -bounds.step);
     }
     bounds.min = newMin;
     bounds.max = newMax;
     bounds.range = bounds.max - bounds.min;
 
-    var values = [];
+    let values = [];
     for (i = bounds.min; i <= bounds.max; i = safeIncrement(i, bounds.step)) {
-      var value = Chartist.roundWithPrecision(i);
+      let value = Chartist.roundWithPrecision(i);
       if (value !== values[values.length - 1]) {
         values.push(value);
       }
     }
     bounds.values = values;
     return bounds;
-  };
+  }
 
   /**
    * Calculate cartesian coordinates of polar coordinates
@@ -821,14 +824,14 @@ var Chartist = {
    * @param {Number} angleInDegrees Angle of circle segment in degrees
    * @return {{x:Number, y:Number}} Coordinates of point on circumference
    */
-  Chartist.polarToCartesian = function (centerX, centerY, radius, angleInDegrees) {
-    var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+  static polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+    let angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
 
     return {
       x: centerX + (radius * Math.cos(angleInRadians)),
       y: centerY + (radius * Math.sin(angleInRadians))
     };
-  };
+  }
 
   /**
    * Initialize chart drawing rectangle (area where chart is drawn) x1,y1 = bottom left / x2,y2 = top right
@@ -839,20 +842,20 @@ var Chartist = {
    * @param {Number} [fallbackPadding] The fallback padding if partial padding objects are used
    * @return {Object} The chart rectangles coordinates inside the svg element plus the rectangles measurements
    */
-  Chartist.createChartRect = function (svg, options, fallbackPadding) {
-    var hasAxis = !!(options.axisX || options.axisY);
-    var yAxisOffset = hasAxis ? options.axisY.offset : 0;
-    var xAxisOffset = hasAxis ? options.axisX.offset : 0;
-    // If width or height results in invalid value (including 0) we fallback to the unitless settings or even 0
-    var width = svg.width() || Chartist.quantity(options.width).value || 0;
-    var height = svg.height() || Chartist.quantity(options.height).value || 0;
-    var normalizedPadding = Chartist.normalizePadding(options.chartPadding, fallbackPadding);
+  static createChartRect(svg, options, fallbackPadding) {
+    let hasAxis = !!(options.axisX || options.axisY);
+    let yAxisOffset = hasAxis ? options.axisY.offset : 0;
+    let xAxisOffset = hasAxis ? options.axisX.offset : 0;
+    // If width or height results in invalid value (including 0) it will be fallback to the unitless settings or even 0
+    let width = svg.width() || Chartist.quantity(options.width).value || 0;
+    let height = svg.height() || Chartist.quantity(options.height).value || 0;
+    let normalizedPadding = Chartist.normalizePadding(options.chartPadding, fallbackPadding);
 
-    // If settings were to small to cope with offset (legacy) and padding, we'll adjust
+    // If settings were too small to cope with offset (legacy) and padding, we'll adjust
     width = Math.max(width, yAxisOffset + normalizedPadding.left + normalizedPadding.right);
     height = Math.max(height, xAxisOffset + normalizedPadding.top + normalizedPadding.bottom);
 
-    var chartRect = {
+    let chartRect = {
       padding: normalizedPadding,
       width: function () {
         return this.x2 - this.x1;
@@ -862,7 +865,7 @@ var Chartist = {
       }
     };
 
-    if(hasAxis) {
+    if (hasAxis) {
       if (options.axisX.position === 'start') {
         chartRect.y2 = normalizedPadding.top + xAxisOffset;
         chartRect.y1 = Math.max(height - normalizedPadding.bottom, chartRect.y2 + 1);
@@ -886,7 +889,7 @@ var Chartist = {
     }
 
     return chartRect;
-  };
+  }
 
   /**
    * Creates a grid line based on a projected value.
@@ -901,14 +904,14 @@ var Chartist = {
    * @param classes
    * @param eventEmitter
    */
-  Chartist.createGrid = function(position, index, axis, offset, length, group, classes, eventEmitter) {
-    var positionalData = {};
+  static createGrid(position, index, axis, offset, length, group, classes, eventEmitter) {
+    let positionalData = {};
     positionalData[axis.units.pos + '1'] = position;
     positionalData[axis.units.pos + '2'] = position;
     positionalData[axis.counterUnits.pos + '1'] = offset;
     positionalData[axis.counterUnits.pos + '2'] = offset + length;
 
-    var gridElement = group.elem('line', positionalData, classes.join(' '));
+    let gridElement = group.elem('line', positionalData, classes.join(' '));
 
     // Event for grid draw
     eventEmitter.emit('draw',
@@ -920,7 +923,7 @@ var Chartist = {
         element: gridElement
       }, positionalData)
     );
-  };
+  }
 
   /**
    * Creates a grid background rect and emits the draw event.
@@ -931,21 +934,21 @@ var Chartist = {
    * @param className
    * @param eventEmitter
    */
-  Chartist.createGridBackground = function (gridGroup, chartRect, className, eventEmitter) {
-    var gridBackground = gridGroup.elem('rect', {
-        x: chartRect.x1,
-        y: chartRect.y2,
-        width: chartRect.width(),
-        height: chartRect.height(),
-      }, className, true);
+  static createGridBackground(gridGroup, chartRect, className, eventEmitter) {
+    let gridBackground = gridGroup.elem('rect', {
+      x: chartRect.x1,
+      y: chartRect.y2,
+      width: chartRect.width(),
+      height: chartRect.height(),
+    }, className, true);
 
-      // Event for grid background draw
-      eventEmitter.emit('draw', {
-        type: 'gridBackground',
-        group: gridGroup,
-        element: gridBackground
-      });
-  };
+    // Event for grid background draw
+    eventEmitter.emit('draw', {
+      type: 'gridBackground',
+      group: gridGroup,
+      element: gridBackground
+    });
+  }
 
   /**
    * Creates a label based on a projected value and an axis.
@@ -963,19 +966,19 @@ var Chartist = {
    * @param useForeignObject
    * @param eventEmitter
    */
-  Chartist.createLabel = function(position, length, index, labels, axis, axisOffset, labelOffset, group, classes, useForeignObject, eventEmitter) {
-    var labelElement;
-    var positionalData = {};
+  static createLabel(position, length, index, labels, axis, axisOffset, labelOffset, group, classes, useForeignObject, eventEmitter) {
+    let labelElement;
+    let positionalData = {};
 
     positionalData[axis.units.pos] = position + labelOffset[axis.units.pos];
     positionalData[axis.counterUnits.pos] = labelOffset[axis.counterUnits.pos];
     positionalData[axis.units.len] = length;
     positionalData[axis.counterUnits.len] = Math.max(0, axisOffset - 10);
 
-    if(useForeignObject) {
+    if (useForeignObject) {
       // We need to set width and height explicitly to px as span will not expand with width and height being
       // 100% in all browsers
-      var content = document.createElement('span');
+      let content = document.createElement('span');
       content.className = classes.join(' ');
       content.setAttribute('xmlns', Chartist.namespaces.xhtml);
       content.innerText = labels[index];
@@ -997,7 +1000,7 @@ var Chartist = {
       element: labelElement,
       text: labels[index]
     }, positionalData));
-  };
+  }
 
   /**
    * Helper to read series specific options from options object. It automatically falls back to the global option if
@@ -1008,14 +1011,14 @@ var Chartist = {
    * @param {string} key The options key that should be used to obtain the options
    * @returns {*}
    */
-  Chartist.getSeriesOption = function(series, options, key) {
-    if(series.name && options.series && options.series[series.name]) {
-      var seriesOptions = options.series[series.name];
+  static getSeriesOption(series, options, key) {
+    if (series.name && options.series && options.series[series.name]) {
+      let seriesOptions = options.series[series.name];
       return seriesOptions.hasOwnProperty(key) ? seriesOptions[key] : options[key];
     } else {
       return options[key];
     }
-  };
+  }
 
   /**
    * Provides options handling functionality with callback for options changes triggered by responsive options and media query matches
@@ -1026,26 +1029,26 @@ var Chartist = {
    * @param {Object} eventEmitter The event emitter that will be used to emit the options changed events
    * @return {Object} The consolidated options object from the defaults, base and matching responsive options
    */
-  Chartist.optionsProvider = function (options, responsiveOptions, eventEmitter) {
-    var baseOptions = Chartist.extend({}, options),
+  static optionsProvider(options, responsiveOptions, eventEmitter) {
+    let baseOptions = Chartist.extend({}, options),
       currentOptions,
       mediaQueryListeners = [],
       i;
 
     function updateCurrentOptions(mediaEvent) {
-      var previousOptions = currentOptions;
+      let previousOptions = currentOptions;
       currentOptions = Chartist.extend({}, baseOptions);
 
       if (responsiveOptions) {
         for (i = 0; i < responsiveOptions.length; i++) {
-          var mql = window.matchMedia(responsiveOptions[i][0]);
+          let mql = window.matchMedia(responsiveOptions[i][0]);
           if (mql.matches) {
             currentOptions = Chartist.extend(currentOptions, responsiveOptions[i][1]);
           }
         }
       }
 
-      if(eventEmitter && mediaEvent) {
+      if (eventEmitter && mediaEvent) {
         eventEmitter.emit('optionsChanged', {
           previousOptions: previousOptions,
           currentOptions: currentOptions
@@ -1054,7 +1057,8 @@ var Chartist = {
     }
 
     function removeMediaQueryListeners() {
-      mediaQueryListeners.forEach(function(mql) {
+      mediaQueryListeners.forEach(function (mql) {
+        // noinspection JSDeprecatedSymbols
         mql.removeListener(updateCurrentOptions);
       });
     }
@@ -1064,12 +1068,13 @@ var Chartist = {
     } else if (responsiveOptions) {
 
       for (i = 0; i < responsiveOptions.length; i++) {
-        var mql = window.matchMedia(responsiveOptions[i][0]);
+        let mql = window.matchMedia(responsiveOptions[i][0]);
+        // noinspection JSDeprecatedSymbols
         mql.addListener(updateCurrentOptions);
         mediaQueryListeners.push(mql);
       }
     }
-    // Execute initially without an event argument so we get the correct options
+    // Execute initially without an event argument, so we get the correct options
     updateCurrentOptions();
 
     return {
@@ -1078,7 +1083,7 @@ var Chartist = {
         return Chartist.extend({}, currentOptions);
       }
     };
-  };
+  }
 
 
   /**
@@ -1101,37 +1106,37 @@ var Chartist = {
    *
    * @memberof Chartist.Core
    * @param {Array} pathCoordinates List of point coordinates to be split in the form [x1, y1, x2, y2 ... xn, yn]
-   * @param {Array} values List of associated point values in the form [v1, v2 .. vn]
+   * @param {Array} valueData List of associated point values in the form [v1, v2 ... vn]
    * @param {Object} options Options set by user
    * @return {Array} List of segments, each containing a pathCoordinates and valueData property.
    */
-  Chartist.splitIntoSegments = function(pathCoordinates, valueData, options) {
-    var defaultOptions = {
+  static splitIntoSegments(pathCoordinates, valueData, options) {
+    let defaultOptions = {
       increasingX: false,
       fillHoles: false
     };
 
     options = Chartist.extend({}, defaultOptions, options);
 
-    var segments = [];
-    var hole = true;
+    let segments = [];
+    let hole = true;
 
-    for(var i = 0; i < pathCoordinates.length; i += 2) {
+    for (let i = 0; i < pathCoordinates.length; i += 2) {
       // If this value is a "hole" we set the hole flag
-      if(Chartist.getMultiValue(valueData[i / 2].value) === undefined) {
-      // if(valueData[i / 2].value === undefined) {
-        if(!options.fillHoles) {
+      if (Chartist.getMultiValue(valueData[i / 2].value) === undefined) {
+        // if(valueData[i / 2].value === undefined) {
+        if (!options.fillHoles) {
           hole = true;
         }
       } else {
-        if(options.increasingX && i >= 2 && pathCoordinates[i] <= pathCoordinates[i-2]) {
+        if (options.increasingX && i >= 2 && pathCoordinates[i] <= pathCoordinates[i - 2]) {
           // X is not increasing, so we need to make sure we start a new segment
           hole = true;
         }
 
 
         // If it's a valid value we need to check if we're coming out of a hole and create a new empty segment
-        if(hole) {
+        if (hole) {
           segments.push({
             pathCoordinates: [],
             valueData: []
@@ -1147,5 +1152,9 @@ var Chartist = {
     }
 
     return segments;
-  };
-}(this || global, Chartist));
+  }
+
+}
+
+
+export default Chartist;

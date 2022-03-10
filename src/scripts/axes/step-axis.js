@@ -1,5 +1,5 @@
 /**
- * The step axis for step based charts like bar chart or step based line charts. It uses a fixed amount of ticks that will be equally distributed across the whole axis length. The projection is done using the index of the data value rather than the value itself and therefore it's only useful for distribution purpose.
+ * The step axis for step based charts like bar chart or step based line charts. It uses a fixed amount of ticks that will be equally distributed across the whole axis length. The projection is done using the index of the data value rather than the value itself, and therefore it's only useful for distribution purpose.
  * **Options**
  * The following options are used by this axis in addition to the default axis options outlined in the axis configuration of the chart default settings.
  * ```javascript
@@ -13,31 +13,40 @@
  *
  * @module Chartist.StepAxis
  */
-/* global Chartist */
-(function (globalRoot, Chartist) {
-  'use strict';
 
-  var window = globalRoot.window;
-  var document = globalRoot.document;
+import Axis from './axis';
 
-  function StepAxis(axisUnit, data, chartRect, options) {
-    Chartist.StepAxis.super.constructor.call(this,
-      axisUnit,
-      chartRect,
-      options.ticks,
-      options);
+class StepAxis extends Axis {
+  /* global Chartist */
+  stepLength;
 
-    var calc = Math.max(1, options.ticks.length - (options.stretch ? 1 : 0));
+  constructor(axisUnit, data, chartRect, options) {
+    super(axisUnit, chartRect, options.ticks, options);
+    // Chartist.StepAxis.super.constructor.call(this,
+    //   axisUnit,
+    //   chartRect,
+    //   options.ticks,
+    //   options);
+
+    let calc = Math.max(1, options.ticks.length - (options.stretch ? 1 : 0));
     this.stepLength = this.axisLength / calc;
   }
 
-  function projectValue(value, index) {
+  /**
+   * @param value {number}
+   * @param index {number}
+   * @param data {Object}
+   * @returns {number}
+   */
+  projectValue(value, index, data) {
     return this.stepLength * index;
   }
 
-  Chartist.StepAxis = Chartist.Axis.extend({
-    constructor: StepAxis,
-    projectValue: projectValue
-  });
+  // StepAxis = Chartist.Axis.extend({
+  //   constructor: StepAxis,
+  //   projectValue: projectValue
+  // });
 
-}(this || global, Chartist));
+}
+
+export default StepAxis;

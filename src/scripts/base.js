@@ -3,11 +3,10 @@
  *
  * @module Chartist.Base
  */
-/* global Chartist */
-(function(globalRoot, Chartist) {
-  'use strict';
 
-  var window = globalRoot.window;
+import Class from './class';
+
+class Base extends Class {
 
   // TODO: Currently we need to re-draw the chart on window resize. This is usually very bad and will affect performance.
   // This is done because we can't work with relative coordinates when drawing the chart because SVG Path does not
@@ -20,11 +19,11 @@
    *
    * @param {Object} [data] Optional data you'd like to set for the chart before it will update. If not specified the update method will use the data that is already configured with the chart.
    * @param {Object} [options] Optional options you'd like to add to the previous options for the chart before it will update. If not specified the update method will use the options that have been already configured with the chart.
-   * @param {Boolean} [override] If set to true, the passed options will be used to extend the options that have been configured already. Otherwise the chart default options will be used as the base
+   * @param {Boolean} [override] If set to true, the passed options will be used to extend the options that have been configured already. Otherwise, the chart default options will be used as the base
    * @memberof Chartist.Base
    */
-  function update(data, options, override) {
-    if(data) {
+  update(data, options, override) {
+    if (data) {
       this.data = data || {};
       this.data.labels = this.data.labels || [];
       this.data.series = this.data.series || [];
@@ -35,19 +34,19 @@
       });
     }
 
-    if(options) {
-      this.options = Chartist.extend({}, override ? this.options : this.defaultOptions, options);
+    if (options) {
+      this.options =  Chartist.extend({}, override ? this.options : this.defaultOptions, options);
 
       // If chartist was not initialized yet, we just set the options and leave the rest to the initialization
       // Otherwise we re-create the optionsProvider at this point
-      if(!this.initializeTimeoutId) {
+      if (!this.initializeTimeoutId) {
         this.optionsProvider.removeMediaQueryListeners();
         this.optionsProvider = Chartist.optionsProvider(this.options, this.responsiveOptions, this.eventEmitter);
       }
     }
 
     // Only re-created the chart if it has been initialized yet
-    if(!this.initializeTimeoutId) {
+    if (!this.initializeTimeoutId) {
       this.createChart(this.optionsProvider.getCurrentOptions());
     }
 
@@ -60,10 +59,10 @@
    *
    * @memberof Chartist.Base
    */
-  function detach() {
+  detach() {
     // Only detach if initialization already occurred on this chart. If this chart still hasn't initialized (therefore
     // the initializationTimeoutId is still a valid timeout reference, we will clear the timeout
-    if(!this.initializeTimeoutId) {
+    if (!this.initializeTimeoutId) {
       window.removeEventListener('resize', this.resizeListener);
       this.optionsProvider.removeMediaQueryListeners();
     } else {
@@ -80,7 +79,7 @@
    * @param {String} event Name of the event. Check the examples for supported events.
    * @param {Function} handler The handler function that will be called when an event with the given name was emitted. This function will receive a data argument which contains event data. See the example for more details.
    */
-  function on(event, handler) {
+  on(event, handler) {
     this.eventEmitter.addEventHandler(event, handler);
     return this;
   }
@@ -92,12 +91,12 @@
    * @param {String} event Name of the event for which a handler should be removed
    * @param {Function} [handler] The handler function that that was previously used to register a new event handler. This handler will be removed from the event handler list. If this parameter is omitted then all event handlers for the given event are removed from the list.
    */
-  function off(event, handler) {
+  off(event, handler) {
     this.eventEmitter.removeEventHandler(event, handler);
     return this;
   }
 
-  function initialize() {
+  initialize() {
     // Add window resize listener that re-creates the chart
     window.addEventListener('resize', this.resizeListener);
 
@@ -105,20 +104,20 @@
     // This will also register a listener that is re-creating the chart based on media changes
     this.optionsProvider = Chartist.optionsProvider(this.options, this.responsiveOptions, this.eventEmitter);
     // Register options change listener that will trigger a chart update
-    this.eventEmitter.addEventHandler('optionsChanged', function() {
+    this.eventEmitter.addEventHandler('optionsChanged', () => {
       this.update();
-    }.bind(this));
+    });
 
     // Before the first chart creation we need to register us with all plugins that are configured
     // Initialize all relevant plugins with our chart object and the plugin options specified in the config
-    if(this.options.plugins) {
-      this.options.plugins.forEach(function(plugin) {
-        if(plugin instanceof Array) {
+    if (this.options.plugins) {
+      this.options.plugins.forEach((plugin) => {
+        if (plugin instanceof Array) {
           plugin[0](this, plugin[1]);
         } else {
           plugin(this);
         }
-      }.bind(this));
+      });
     }
 
     // Event for data transformation that allows to manipulate the data before it gets rendered in the charts
@@ -135,17 +134,8 @@
     this.initializeTimeoutId = undefined;
   }
 
-  /**
-   * Constructor of chart base class.
-   *
-   * @param query
-   * @param data
-   * @param defaultOptions
-   * @param options
-   * @param responsiveOptions
-   * @constructor
-   */
-  function Base(query, data, defaultOptions, options, responsiveOptions) {
+  constructor(query, data, defaultOptions, options, responsiveOptions) {
+    super();
     this.container = Chartist.querySelector(query);
     this.data = data || {};
     this.data.labels = this.data.labels || [];
@@ -156,13 +146,13 @@
     this.eventEmitter = Chartist.EventEmitter();
     this.supportsForeignObject = Chartist.Svg.isSupported('Extensibility');
     this.supportsAnimations = Chartist.Svg.isSupported('AnimationEventsAttribute');
-    this.resizeListener = function resizeListener(){
+    this.resizeListener = () => {
       this.update();
-    }.bind(this);
+    };
 
-    if(this.container) {
+    if (this.container) {
       // If chartist was already initialized in this container we are detaching all event listeners first
-      if(this.container.__chartist__) {
+      if (this.container.__chartist__) {
         this.container.__chartist__.detach();
       }
 
@@ -171,25 +161,13 @@
 
     // Using event loop for first draw to make it possible to register event listeners in the same call stack where
     // the chart was created.
-    this.initializeTimeoutId = setTimeout(initialize.bind(this), 0);
+    this.initializeTimeoutId = setTimeout(this.initialize, 0);
   }
 
-  // Creating the chart base class
-  Chartist.Base = Chartist.Class.extend({
-    constructor: Base,
-    optionsProvider: undefined,
-    container: undefined,
-    svg: undefined,
-    eventEmitter: undefined,
-    createChart: function() {
-      throw new Error('Base chart type can\'t be instantiated!');
-    },
-    update: update,
-    detach: detach,
-    on: on,
-    off: off,
-    version: Chartist.version,
-    supportsForeignObject: false
-  });
+  createChart() {
+    throw new Error('Base chart type can\'t be instantiated!');
+  }
 
-}(this || global, Chartist));
+}
+
+export default Base;
