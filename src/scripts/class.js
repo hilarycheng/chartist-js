@@ -1,11 +1,12 @@
 /**
  * This module provides some basic prototype inheritance utilities.
  *
- * @module Chartist.Class
+ * @module Class
  */
 
 class Class {
 
+  // noinspection JSUnusedGlobalSymbols
   listToArray(list) {
     let arr = [];
     if (list.length) {

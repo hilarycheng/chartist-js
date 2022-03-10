@@ -17,9 +17,9 @@
  * };
  * ```
  *
- * @module Chartist.AutoScaleAxis
+ * @module AutoScaleAxis
  */
-/* global Chartist */
+import Chartist from '../core';
 import Axis from "./axis";
 
 class AutoScaleAxis extends Axis {

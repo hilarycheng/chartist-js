@@ -1,10 +1,12 @@
-// noinspection JSUnusedGlobalSymbols
 /**
  * Chartist path interpolation functions.
  *
- * @module Chartist.Interpolation
+ * @module Interpolation
  */
 
+import Chartist from './core';
+
+// noinspection JSUnusedGlobalSymbols
 class Interpolation {
 
   /**
@@ -21,10 +23,10 @@ class Interpolation {
    * });
    *
    *
-   * @memberof Chartist.Interpolation
+   * @memberof Interpolation
    * @return {Function}
    */
-  none(options) {
+  static none(options) {
     let defaultOptions = {
       fillHoles: false
     };
@@ -75,7 +77,7 @@ class Interpolation {
    * });
    *
    *
-   * @memberof Chartist.Interpolation
+   * @memberof Interpolation
    * @param {Object} options The options of the simple interpolation factory function.
    * @return {Function}
    */
@@ -127,6 +129,7 @@ class Interpolation {
     };
   }
 
+  // noinspection JSUnusedGlobalSymbols
   /**
    * Cardinal / Catmull-Rome spline interpolation is the default smoothing function in Chartist. It produces nice results where the splines will always meet the points. It produces some artifacts though when data values are increased or decreased rapidly. The line may not follow a very accurate path and if the line should be accurate this smoothing function does not produce the best results.
    *
@@ -145,7 +148,7 @@ class Interpolation {
    *   })
    * });
    *
-   * @memberof Chartist.Interpolation
+   * @memberof Interpolation
    * @param {Object} options The options of the cardinal factory function.
    * @return {Function}
    */
@@ -254,7 +257,7 @@ class Interpolation {
    *   })
    * });
    *
-   * @memberof Chartist.Interpolation
+   * @memberof Interpolation
    * @param {Object} options The options of the monotoneCubic factory function.
    * @return {Function}
    */
@@ -366,6 +369,7 @@ class Interpolation {
     };
   };
 
+  // noinspection JSUnusedGlobalSymbols
   /**
    * Step interpolation will cause the line chart to move in steps rather than diagonal or smoothed lines. This interpolation will create additional points that will also be drawn when the `showPoint` option is enabled.
    *
@@ -382,11 +386,11 @@ class Interpolation {
    *   })
    * });
    *
-   * @memberof Chartist.Interpolation
+   * @memberof Interpolation
    * @param options
    * @returns {Function}
    */
-  step = function (options) {
+  step(options) {
     let defaultOptions = {
       postpone: true,
       fillHoles: false

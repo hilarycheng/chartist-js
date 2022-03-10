@@ -15,10 +15,9 @@
  * };
  * ```
  *
- * @module Chartist.FixedScaleAxis
+ * @module FixedScaleAxis
  */
-/* global Chartist */
-
+import Chartist from '../core';
 import Axis from "./axis";
 
 class FixedScaleAxis extends Axis {

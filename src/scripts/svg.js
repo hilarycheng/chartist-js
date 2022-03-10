@@ -3,7 +3,7 @@
  *
  * @module Chartist.Svg
  */
-
+import Chartist from './core';
 import Path from './svg-path';
 
 class List {
@@ -434,7 +434,7 @@ class Svg {
           // If already an easing Bézier curve array we take it, or we look up an easing array in the Easing object
           easing = animationDefinition.easing instanceof Array ?
             animationDefinition.easing :
-            Chartist.Svg.Easing[animationDefinition.easing];
+            this.Easing[animationDefinition.easing];
           delete animationDefinition.easing;
         }
 

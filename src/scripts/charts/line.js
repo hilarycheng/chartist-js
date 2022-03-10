@@ -5,8 +5,12 @@
  *
  * @module Chartist.Line
  */
-/* global Chartist */
+import Chartist from '../core';
 import Base from "../base";
+import Axis from "../axes/axis";
+import StepAxis from "../axes/step-axis";
+import AutoScaleAxis from "../axes/auto-scale-axis";
+import Interpolation from "../interpolation";
 
 class Line extends Base {
   /**
@@ -127,21 +131,21 @@ class Line extends Base {
     let axisX, axisY;
 
     if (options.axisX.type === undefined) {
-      axisX = new Chartist.StepAxis(Chartist.Axis.units.x, data.normalized.series, chartRect, Chartist.extend({}, options.axisX, {
+      axisX = new StepAxis(Axis.axisUnits.x, data.normalized.series, chartRect, Chartist.extend({}, options.axisX, {
         ticks: data.normalized.labels,
         stretch: options.fullWidth
       }));
     } else {
-      axisX = options.axisX.type.call(Chartist, Chartist.Axis.units.x, data.normalized.series, chartRect, options.axisX);
+      axisX = options.axisX.type.call(Chartist, Axis.axisUnits.x, data.normalized.series, chartRect, options.axisX);
     }
 
     if (options.axisY.type === undefined) {
-      axisY = new Chartist.AutoScaleAxis(Chartist.Axis.units.y, data.normalized.series, chartRect, Chartist.extend({}, options.axisY, {
+      axisY = new AutoScaleAxis(Axis.axisUnits.y, data.normalized.series, chartRect, Chartist.extend({}, options.axisY, {
         high: Chartist.isNumeric(options.high) ? options.high : options.axisY.high,
         low: Chartist.isNumeric(options.low) ? options.low : options.axisY.low
       }));
     } else {
-      axisY = options.axisY.type.call(Chartist, Chartist.Axis.units.y, data.normalized.series, chartRect, options.axisY);
+      axisY = options.axisY.type.call(Chartist, Axis.axisUnits.y, data.normalized.series, chartRect, options.axisY);
     }
 
     axisX.createGridAndLabels(gridGroup, labelGroup, this.supportsForeignObject, options, this.eventEmitter);
@@ -192,7 +196,7 @@ class Line extends Base {
       };
 
       let smoothing = typeof seriesOptions.lineSmooth === 'function' ?
-        seriesOptions.lineSmooth : (seriesOptions.lineSmooth ? Chartist.Interpolation.monotoneCubic() : Chartist.Interpolation.none());
+        seriesOptions.lineSmooth : (seriesOptions.lineSmooth ? Interpolation.monotoneCubic({}) : Interpolation.none({}));
       // Interpolating path where pathData will be used to annotate each path element, so we can trace back the original
       // index, value and metadata
       let path = smoothing(pathCoordinates, pathData);

@@ -1,8 +1,8 @@
-/* global Chartist */
+import Chartist from '../core';
 
 class Axis {
 
-  axisUnits = {
+  static axisUnits = {
     x: {
       pos: 'x',
       len: 'width',
@@ -21,9 +21,17 @@ class Axis {
     }
   };
 
+  units;
+  counterUnits;
+  chartRect;
+  axisLength;
+  gridOffset;
+  ticks;
+  options;
+
   constructor(units, chartRect, ticks, options) {
     this.units = units;
-    this.counterUnits = units === this.axisUnits.x ? this.axisUnits.y : this.axisUnits.x;
+    this.counterUnits = units === Axis.axisUnits.x ? Axis.axisUnits.y : Axis.axisUnits.x;
     this.chartRect = chartRect;
     this.axisLength = chartRect[units.rectEnd] - chartRect[units.rectStart];
     this.gridOffset = chartRect[units.rectOffset];

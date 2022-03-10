@@ -3,8 +3,9 @@
  *
  * @module Chartist.Pie
  */
-/* global Chartist */
-import Base from "../base";
+import Chartist from '../core';
+import Base from '../base';
+import Path from '../svg-path';
 
 class Pie extends Base {
   /**
@@ -189,7 +190,7 @@ class Pie extends Base {
         donutSolidRadius;
 
       // Create a new path element for the pie chart. If this isn't a donut chart we should close the path for a correct stroke
-      let path = new Chartist.Svg.Path(!options.donut || options.donutSolid)
+      let path = new Path(!options.donut || options.donutSolid, undefined)
         .move(end.x, end.y)
         .arc(radius, radius, 0, endAngle - startAngle > 180, 0, start.x, start.y);
 

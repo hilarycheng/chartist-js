@@ -13,11 +13,11 @@
  *
  * @module Chartist.StepAxis
  */
-
+import Chartist from '../core';
 import Axis from './axis';
 
 class StepAxis extends Axis {
-  /* global Chartist */
+
   stepLength;
 
   constructor(axisUnit, data, chartRect, options) {

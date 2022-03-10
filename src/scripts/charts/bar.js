@@ -1,9 +1,12 @@
 /**
  * The bar chart module of Chartist that can be used to draw unipolar or bipolar bar and grouped bar charts.
  *
- * @module Chartist.Bar
+ * @module Bar
  */
-/* global Chartist */
+import Chartist from '../core';
+import AutoScaleAxis from "../axes/auto-scale-axis";
+import StepAxis from "../axes/step-axis";
+import Axis from "../axes/axis";
 import Base from "../base";
 
 class Bar extends Base {
@@ -11,7 +14,7 @@ class Bar extends Base {
   /**
    * Default options in bar charts. Expand the code view to see a detailed list of options with comments.
    *
-   * @memberof Chartist.Bar
+   * @memberof Bar
    */
   defaultOptions = {
     // Options for X-Axis
@@ -117,12 +120,12 @@ class Bar extends Base {
     let highLow;
 
     if (options.distributeSeries) {
-      data = Chartist.normalizeData(this.data, options.reverseData, options.horizontalBars ? 'x' : 'y');
+      data = Chartist.normalizeData(this.data, options.reverseData, options.horizontalBars);
       data.normalized.series = data.normalized.series.map(function (value) {
         return [value];
       });
     } else {
-      data = Chartist.normalizeData(this.data, options.reverseData, options.horizontalBars ? 'x' : 'y');
+      data = Chartist.normalizeData(this.data, options.reverseData, options.horizontalBars);
     }
 
     // Create new svg element
@@ -186,40 +189,40 @@ class Bar extends Base {
     // Set labelAxis and valueAxis based on the horizontalBars setting. This setting will flip the axes if necessary.
     if (options.horizontalBars) {
       if (options.axisX.type === undefined) {
-        valueAxis = axisX = new Chartist.AutoScaleAxis(Chartist.Axis.units.x, data.normalized.series, chartRect, Chartist.extend({}, options.axisX, {
+        valueAxis = axisX = new AutoScaleAxis(Axis.axisUnits.x, data.normalized.series, chartRect, Chartist.extend({}, options.axisX, {
           highLow: highLow,
           referenceValue: 0
         }));
       } else {
-        valueAxis = axisX = options.axisX.type.call(Chartist, Chartist.Axis.units.x, data.normalized.series, chartRect, Chartist.extend({}, options.axisX, {
+        valueAxis = axisX = options.axisX.type.call(Chartist, Axis.axisUnits.x, data.normalized.series, chartRect, Chartist.extend({}, options.axisX, {
           highLow: highLow,
           referenceValue: 0
         }));
       }
 
       if (options.axisY.type === undefined) {
-        labelAxis = axisY = new Chartist.StepAxis(Chartist.Axis.units.y, data.normalized.series, chartRect, {
+        labelAxis = axisY = new StepAxis(Axis.axisUnits.y, data.normalized.series, chartRect, {
           ticks: labelAxisTicks
         });
       } else {
-        labelAxis = axisY = options.axisY.type.call(Chartist, Chartist.Axis.units.y, data.normalized.series, chartRect, options.axisY);
+        labelAxis = axisY = options.axisY.type.call(Chartist, Axis.axisUnits.y, data.normalized.series, chartRect, options.axisY);
       }
     } else {
       if (options.axisX.type === undefined) {
-        labelAxis = axisX = new Chartist.StepAxis(Chartist.Axis.units.x, data.normalized.series, chartRect, {
+        labelAxis = axisX = new StepAxis(Axis.axisUnits.x, data.normalized.series, chartRect, {
           ticks: labelAxisTicks
         });
       } else {
-        labelAxis = axisX = options.axisX.type.call(Chartist, Chartist.Axis.units.x, data.normalized.series, chartRect, options.axisX);
+        labelAxis = axisX = options.axisX.type.call(Chartist, Axis.axisUnits.x, data.normalized.series, chartRect, options.axisX);
       }
 
       if (options.axisY.type === undefined) {
-        valueAxis = axisY = new Chartist.AutoScaleAxis(Chartist.Axis.units.y, data.normalized.series, chartRect, Chartist.extend({}, options.axisY, {
+        valueAxis = axisY = new AutoScaleAxis(Axis.axisUnits.y, data.normalized.series, chartRect, Chartist.extend({}, options.axisY, {
           highLow: highLow,
           referenceValue: 0
         }));
       } else {
-        valueAxis = axisY = options.axisY.type.call(Chartist, Chartist.Axis.units.y, data.normalized.series, chartRect, Chartist.extend({}, options.axisY, {
+        valueAxis = axisY = options.axisY.type.call(Chartist, Axis.axisUnits.y, data.normalized.series, chartRect, Chartist.extend({}, options.axisY, {
           highLow: highLow,
           referenceValue: 0
         }));
@@ -227,7 +230,7 @@ class Bar extends Base {
     }
 
     // Projected 0 point
-    let zeroPoint = options.horizontalBars ? (chartRect.x1 + valueAxis.projectValue(0)) : (chartRect.y1 - valueAxis.projectValue(0));
+    let zeroPoint = options.horizontalBars ? (chartRect.x1 + valueAxis.projectValue(0, undefined, undefined)) : (chartRect.y1 - valueAxis.projectValue(0, undefined, undefined));
     // Used to track the screen coordinates of stacked bars
     let stackedBarValues = [];
 
@@ -313,7 +316,7 @@ class Bar extends Base {
         // the periodHalfLength value. Also, we do arrange the different series so that they align up to each other using
         // the seriesBarDistance. If we don't have a step axis, the bar positions can be chosen freely, so we should not
         // add any automated positioning.
-        if (labelAxis instanceof Chartist.StepAxis) {
+        if (labelAxis instanceof StepAxis) {
           // Offset to center bar between grid lines, but only if the step axis is not stretched
           if (!labelAxis.options.stretch) {
             projected[labelAxis.units.pos] += periodHalfLength * (options.horizontalBars ? -1 : 1);
@@ -392,7 +395,7 @@ class Bar extends Base {
   /**
    * This method creates a new bar chart and returns API objects that you can use for later changes.
    *
-   * @memberof Chartist.Bar
+   * @memberof Bar
    * @param {String|Node} query A selector query string or directly a DOM element
    * @param {Object} data The data object that needs to consist of a labels and a series array
    * @param {Object} [options] The options object with options that override the default options. Check the examples for a detailed list.
