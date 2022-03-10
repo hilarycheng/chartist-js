@@ -4,18 +4,15 @@
  * @module Chartist.Pie
  */
 /* global Chartist */
-(function(globalRoot, Chartist) {
-  'use strict';
+import Base from "../base";
 
-  var window = globalRoot.window;
-  var document = globalRoot.document;
-
+class Pie extends Base {
   /**
    * Default options in line charts. Expand the code view to see a detailed list of options with comments.
    *
    * @memberof Chartist.Pie
    */
-  var defaultOptions = {
+  defaultOptions = {
     // Specify a fixed width for the chart as a string (i.e. '100px' or '50%')
     width: undefined,
     // Specify a fixed height for the chart as a string (i.e. '100px' or '50%')
@@ -55,10 +52,11 @@
     labelDirection: 'neutral',
     // If true the whole data is reversed including labels, the series order as well as the whole series data arrays.
     reverseData: false,
-    // If true empty values will be ignored to avoid drawing unncessary slices and labels
+    // If true empty values will be ignored to avoid drawing unnecessary slices and labels
     ignoreEmptyValues: false
   };
 
+  // noinspection JSUnusedGlobalSymbols
   /**
    * Determines SVG anchor position based on direction and center parameter
    *
@@ -67,13 +65,13 @@
    * @param direction
    * @return {string}
    */
-  function determineAnchorPosition(center, label, direction) {
-    var toTheRight = label.x > center.x;
+  determineAnchorPosition(center, label, direction) {
+    let toTheRight = label.x > center.x;
 
-    if(toTheRight && direction === 'explode' ||
+    if (toTheRight && direction === 'explode' ||
       !toTheRight && direction === 'implode') {
       return 'start';
-    } else if(toTheRight && direction === 'implode' ||
+    } else if (toTheRight && direction === 'implode' ||
       !toTheRight && direction === 'explode') {
       return 'end';
     } else {
@@ -86,9 +84,9 @@
    *
    * @param options
    */
-  function createChart(options) {
-    var data = Chartist.normalizeData(this.data);
-    var seriesGroups = [],
+  createChart(options) {
+    let data = Chartist.normalizeData(this.data);
+    let seriesGroups = [],
       labelsGroup,
       chartRect,
       radius,
@@ -97,17 +95,17 @@
       startAngle = options.startAngle;
 
     // Create SVG.js draw
-    this.svg = Chartist.createSvg(this.container, options.width, options.height,options.donut ? options.classNames.chartDonut : options.classNames.chartPie);
+    this.svg = Chartist.createSvg(this.container, options.width, options.height, options.donut ? options.classNames.chartDonut : options.classNames.chartPie);
     // Calculate charting rect
-    chartRect = Chartist.createChartRect(this.svg, options, defaultOptions.padding);
-    // Get biggest circle radius possible within chartRect
+    chartRect = Chartist.createChartRect(this.svg, options, this.defaultOptions.padding);
+    // Get the biggest circle radius possible within chartRect
     radius = Math.min(chartRect.width() / 2, chartRect.height() / 2);
     // Calculate total of all series to get reference value or use total reference from optional options
-    totalDataSum = options.total || data.normalized.series.reduce(function(previousValue, currentValue) {
+    totalDataSum = options.total || data.normalized.series.reduce(function (previousValue, currentValue) {
       return previousValue + currentValue;
     }, 0);
 
-    var donutWidth = Chartist.quantity(options.donutWidth);
+    let donutWidth = Chartist.quantity(options.donutWidth);
     if (donutWidth.unit === '%') {
       donutWidth.value *= radius / 100;
     }
@@ -115,16 +113,16 @@
     // If this is a donut chart we need to adjust our radius to enable strokes to be drawn inside
     // Unfortunately this is not possible with the current SVG Spec
     // See this proposal for more details: http://lists.w3.org/Archives/Public/www-svg/2003Oct/0000.html
-    radius -= options.donut && !options.donutSolid ? donutWidth.value / 2  : 0;
+    radius -= options.donut && !options.donutSolid ? donutWidth.value / 2 : 0;
 
     // If labelPosition is set to `outside` or a donut chart is drawn then the label position is at the radius,
     // if regular pie chart it's half of the radius
-    if(options.labelPosition === 'outside' || options.donut && !options.donutSolid) {
+    if (options.labelPosition === 'outside' || options.donut && !options.donutSolid) {
       labelRadius = radius;
-    } else if(options.labelPosition === 'center') {
+    } else if (options.labelPosition === 'center') {
       // If labelPosition is center we start with 0 and will later wait for the labelOffset
       labelRadius = 0;
-    } else if(options.donutSolid) {
+    } else if (options.donutSolid) {
       labelRadius = radius - donutWidth.value / 2;
     } else {
       // Default option is 'inside' where we use half the radius so the label will be placed in the center of the pie
@@ -135,32 +133,32 @@
     labelRadius += options.labelOffset;
 
     // Calculate end angle based on total sum and current data value and offset with padding
-    var center = {
+    let center = {
       x: chartRect.x1 + chartRect.width() / 2,
       y: chartRect.y2 + chartRect.height() / 2
     };
 
     // Check if there is only one non-zero value in the series array.
-    var hasSingleValInSeries = data.raw.series.filter(function(val) {
+    let hasSingleValInSeries = data.raw.series.filter(function (val) {
       return val.hasOwnProperty('value') ? val.value !== 0 : val !== 0;
     }).length === 1;
 
     // Creating the series groups
-    data.raw.series.forEach(function(series, index) {
+    data.raw.series.forEach((series, index) => {
       seriesGroups[index] = this.svg.elem('g', null, null);
-    }.bind(this));
+    });
     //if we need to show labels we create the label group now
-    if(options.showLabel) {
+    if (options.showLabel) {
       labelsGroup = this.svg.elem('g', null, null);
     }
 
     // Draw the series
     // initialize series groups
-    data.raw.series.forEach(function(series, index) {
-      // If current value is zero and we are ignoring empty values then skip to next value
+    data.raw.series.forEach((series, index) => {
+      // If current value is zero, and we are ignoring empty values then skip to next value
       if (data.normalized.series[index] === 0 && options.ignoreEmptyValues) return;
 
-      // If the series is an object and contains a name or meta data we add a custom attribute
+      // If the series is an object and contains a name or metadata we add a custom attribute
       seriesGroups[index].attr({
         'ct:series-name': series.name
       });
@@ -172,50 +170,50 @@
       ].join(' '));
 
       // If the whole dataset is 0 endAngle should be zero. Can't divide by 0.
-      var endAngle = (totalDataSum > 0 ? startAngle + data.normalized.series[index] / totalDataSum * 360 : 0);
+      let endAngle = (totalDataSum > 0 ? startAngle + data.normalized.series[index] / totalDataSum * 360 : 0);
 
       // Use slight offset so there are no transparent hairline issues
-      var overlappigStartAngle = Math.max(0, startAngle - (index === 0 || hasSingleValInSeries ? 0 : 0.2));
+      let overlappingStartAngle = Math.max(0, startAngle - (index === 0 || hasSingleValInSeries ? 0 : 0.2));
 
       // If we need to draw the arc for all 360 degrees we need to add a hack where we close the circle
       // with Z and use 359.99 degrees
-      if(endAngle - overlappigStartAngle >= 359.99) {
-        endAngle = overlappigStartAngle + 359.99;
+      if (endAngle - overlappingStartAngle >= 359.99) {
+        endAngle = overlappingStartAngle + 359.99;
       }
 
-      var start = Chartist.polarToCartesian(center.x, center.y, radius, overlappigStartAngle),
+      let start = Chartist.polarToCartesian(center.x, center.y, radius, overlappingStartAngle),
         end = Chartist.polarToCartesian(center.x, center.y, radius, endAngle);
 
-      var innerStart,
+      let innerStart,
         innerEnd,
         donutSolidRadius;
 
       // Create a new path element for the pie chart. If this isn't a donut chart we should close the path for a correct stroke
-      var path = new Chartist.Svg.Path(!options.donut || options.donutSolid)
+      let path = new Chartist.Svg.Path(!options.donut || options.donutSolid)
         .move(end.x, end.y)
         .arc(radius, radius, 0, endAngle - startAngle > 180, 0, start.x, start.y);
 
       // If regular pie chart (no donut) we add a line to the center of the circle for completing the pie
-      if(!options.donut) {
+      if (!options.donut) {
         path.line(center.x, center.y);
       } else if (options.donutSolid) {
         donutSolidRadius = radius - donutWidth.value;
         innerStart = Chartist.polarToCartesian(center.x, center.y, donutSolidRadius, startAngle - (index === 0 || hasSingleValInSeries ? 0 : 0.2));
         innerEnd = Chartist.polarToCartesian(center.x, center.y, donutSolidRadius, endAngle);
         path.line(innerStart.x, innerStart.y);
-        path.arc(donutSolidRadius, donutSolidRadius, 0, endAngle - startAngle  > 180, 1, innerEnd.x, innerEnd.y);
+        path.arc(donutSolidRadius, donutSolidRadius, 0, endAngle - startAngle > 180, 1, innerEnd.x, innerEnd.y);
       }
 
       // Create the SVG path
       // If this is a donut chart we add the donut class, otherwise just a regular slice
-      var pathClassName = options.classNames.slicePie;
+      let pathClassName = options.classNames.slicePie;
       if (options.donut) {
         pathClassName = options.classNames.sliceDonut;
         if (options.donutSolid) {
           pathClassName = options.classNames.sliceDonutSolid;
         }
       }
-      var pathElement = seriesGroups[index].elem('path', {
+      let pathElement = seriesGroups[index].elem('path', {
         d: path.stringify()
       }, pathClassName);
 
@@ -226,7 +224,7 @@
       });
 
       // If this is a donut, we add the stroke-width as style attribute
-      if(options.donut && !options.donutSolid) {
+      if (options.donut && !options.donutSolid) {
         pathElement._node.style.strokeWidth = donutWidth.value + 'px';
       }
 
@@ -248,9 +246,9 @@
       });
 
       // If we need to show labels we need to add the label for this slice now
-      if(options.showLabel) {
-        var labelPosition;
-        if(data.raw.series.length === 1) {
+      if (options.showLabel) {
+        let labelPosition;
+        if (data.raw.series.length === 1) {
           // If we have only 1 series, we can position the label in the center of the pie
           labelPosition = {
             x: center.x,
@@ -266,20 +264,20 @@
           );
         }
 
-        var rawValue;
-        if(data.normalized.labels && !Chartist.isFalseyButZero(data.normalized.labels[index])) {
+        let rawValue;
+        if (data.normalized.labels && !Chartist.isFalseyButZero(data.normalized.labels[index])) {
           rawValue = data.normalized.labels[index];
         } else {
           rawValue = data.normalized.series[index];
         }
 
-        var interpolatedValue = options.labelInterpolationFnc(rawValue, index);
+        let interpolatedValue = options.labelInterpolationFnc(rawValue, index);
 
-        if(interpolatedValue || interpolatedValue === 0) {
-          var labelElement = labelsGroup.elem('text', {
+        if (interpolatedValue || interpolatedValue === 0) {
+          let labelElement = labelsGroup.elem('text', {
             dx: labelPosition.x,
             dy: labelPosition.y,
-            'text-anchor': determineAnchorPosition(center, labelPosition, options.labelDirection)
+            'text-anchor': this.determineAnchorPosition(center, labelPosition, options.labelDirection)
           }, options.classNames.label).text('' + interpolatedValue);
 
           // Fire off draw event
@@ -298,7 +296,7 @@
       // Set next startAngle to current endAngle.
       // (except for last slice)
       startAngle = endAngle;
-    }.bind(this));
+    });
 
     this.eventEmitter.emit('created', {
       chartRect: chartRect,
@@ -353,8 +351,8 @@
    * });
    *
    * @example
-   * // Overriding the class names for individual series as well as a name and meta data.
-   * // The name will be written as ct:series-name attribute and the meta data will be serialized and written
+   * // Overriding the class names for individual series as well as a name and metadata.
+   * // The name will be written as ct:series-name attribute and the metadata will be serialized and written
    * // to a ct:meta attribute.
    * new Chartist.Pie('.ct-chart', {
    *   series: [{
@@ -375,20 +373,17 @@
    *   }]
    * });
    */
-  function Pie(query, data, options, responsiveOptions) {
-    Chartist.Pie.super.constructor.call(this,
-      query,
-      data,
-      defaultOptions,
-      Chartist.extend({}, defaultOptions, options),
-      responsiveOptions);
+  constructor(query, data, options, responsiveOptions) {
+    super(query, data, {}, Chartist.extend({}, {}, options))
   }
 
   // Creating pie chart type in Chartist namespace
-  Chartist.Pie = Chartist.Base.extend({
-    constructor: Pie,
-    createChart: createChart,
-    determineAnchorPosition: determineAnchorPosition
-  });
+  // Pie = Chartist.Base.extend({
+  //   constructor: Pie,
+  //   createChart: createChart,
+  //   determineAnchorPosition: determineAnchorPosition
+  // });
 
-}(this || global, Chartist));
+}
+
+export default Pie;

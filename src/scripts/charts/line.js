@@ -6,18 +6,15 @@
  * @module Chartist.Line
  */
 /* global Chartist */
-(function(globalRoot, Chartist){
-  'use strict';
+import Base from "../base";
 
-  var window = globalRoot.window;
-  var document = globalRoot.document;
-
+class Line extends Base {
   /**
    * Default options in line charts. Expand the code view to see a detailed list of options with comments.
    *
    * @memberof Chartist.Line
    */
-  var defaultOptions = {
+  defaultOptions = {
     // Options for X-Axis
     axisX: {
       // The offset of the labels to the chart area
@@ -78,9 +75,9 @@
     lineSmooth: true,
     // If the line chart should add a background fill to the .ct-grids group.
     showGridBackground: false,
-    // Overriding the natural low of the chart allows you to zoom in or limit the charts lowest displayed value
+    // Overriding the natural low of the chart allows you to zoom in or limit the charts the lowest displayed value
     low: undefined,
-    // Overriding the natural high of the chart allows you to zoom in or limit the charts highest displayed value
+    // Overriding the natural high of the chart allows you to zoom in or limit the charts the highest displayed value
     high: undefined,
     // Padding of the chart drawing area to the container element and labels as a number or padding object {top: 5, right: 5, bottom: 5, left: 5}
     chartPadding: {
@@ -116,20 +113,20 @@
    * Creates a new chart
    *
    */
-  function createChart(options) {
-    var data = Chartist.normalizeData(this.data, options.reverseData, true);
+  createChart(options) {
+    let data = Chartist.normalizeData(this.data, options.reverseData, true);
 
     // Create new svg object
     this.svg = Chartist.createSvg(this.container, options.width, options.height, options.classNames.chart);
     // Create groups for labels, grid and series
-    var gridGroup = this.svg.elem('g').addClass(options.classNames.gridGroup);
-    var seriesGroup = this.svg.elem('g');
-    var labelGroup = this.svg.elem('g').addClass(options.classNames.labelGroup);
+    let gridGroup = this.svg.elem('g').addClass(options.classNames.gridGroup);
+    let seriesGroup = this.svg.elem('g');
+    let labelGroup = this.svg.elem('g').addClass(options.classNames.labelGroup);
 
-    var chartRect = Chartist.createChartRect(this.svg, options, defaultOptions.padding);
-    var axisX, axisY;
+    let chartRect = Chartist.createChartRect(this.svg, options, this.defaultOptions.padding);
+    let axisX, axisY;
 
-    if(options.axisX.type === undefined) {
+    if (options.axisX.type === undefined) {
       axisX = new Chartist.StepAxis(Chartist.Axis.units.x, data.normalized.series, chartRect, Chartist.extend({}, options.axisX, {
         ticks: data.normalized.labels,
         stretch: options.fullWidth
@@ -138,7 +135,7 @@
       axisX = options.axisX.type.call(Chartist, Chartist.Axis.units.x, data.normalized.series, chartRect, options.axisX);
     }
 
-    if(options.axisY.type === undefined) {
+    if (options.axisY.type === undefined) {
       axisY = new Chartist.AutoScaleAxis(Chartist.Axis.units.y, data.normalized.series, chartRect, Chartist.extend({}, options.axisY, {
         high: Chartist.isNumeric(options.high) ? options.high : options.axisY.high,
         low: Chartist.isNumeric(options.low) ? options.low : options.axisY.low
@@ -155,8 +152,8 @@
     }
 
     // Draw the series
-    data.raw.series.forEach(function(series, seriesIndex) {
-      var seriesElement = seriesGroup.elem('g');
+    data.raw.series.forEach((series, seriesIndex) => {
+      let seriesElement = seriesGroup.elem('g');
 
       // Write attributes to series group element. If series name or meta is undefined the attributes will not be written
       seriesElement.attr({
@@ -170,11 +167,11 @@
         (series.className || options.classNames.series + '-' + Chartist.alphaNumerate(seriesIndex))
       ].join(' '));
 
-      var pathCoordinates = [],
+      let pathCoordinates = [],
         pathData = [];
 
-      data.normalized.series[seriesIndex].forEach(function(value, valueIndex) {
-        var p = {
+      data.normalized.series[seriesIndex].forEach((value, valueIndex) => {
+        let p = {
           x: chartRect.x1 + axisX.projectValue(value, valueIndex, data.normalized.series[seriesIndex]),
           y: chartRect.y1 - axisY.projectValue(value, valueIndex, data.normalized.series[seriesIndex])
         };
@@ -184,9 +181,9 @@
           valueIndex: valueIndex,
           meta: Chartist.getMetaData(series, valueIndex)
         });
-      }.bind(this));
+      });
 
-      var seriesOptions = {
+      let seriesOptions = {
         lineSmooth: Chartist.getSeriesOption(series, options, 'lineSmooth'),
         showPoint: Chartist.getSeriesOption(series, options, 'showPoint'),
         showLine: Chartist.getSeriesOption(series, options, 'showLine'),
@@ -194,19 +191,19 @@
         areaBase: Chartist.getSeriesOption(series, options, 'areaBase')
       };
 
-      var smoothing = typeof seriesOptions.lineSmooth === 'function' ?
+      let smoothing = typeof seriesOptions.lineSmooth === 'function' ?
         seriesOptions.lineSmooth : (seriesOptions.lineSmooth ? Chartist.Interpolation.monotoneCubic() : Chartist.Interpolation.none());
-      // Interpolating path where pathData will be used to annotate each path element so we can trace back the original
-      // index, value and meta data
-      var path = smoothing(pathCoordinates, pathData);
+      // Interpolating path where pathData will be used to annotate each path element, so we can trace back the original
+      // index, value and metadata
+      let path = smoothing(pathCoordinates, pathData);
 
       // If we should show points we need to create them now to avoid secondary loop
       // Points are drawn from the pathElements returned by the interpolation function
       // Small offset for Firefox to render squares correctly
       if (seriesOptions.showPoint) {
 
-        path.pathElements.forEach(function(pathElement) {
-          var point = seriesElement.elem('line', {
+        path.pathElements.forEach((pathElement) => {
+          let point = seriesElement.elem('line', {
             x1: pathElement.x,
             y1: pathElement.y,
             x2: pathElement.x + 0.01,
@@ -230,11 +227,11 @@
             x: pathElement.x,
             y: pathElement.y
           });
-        }.bind(this));
+        });
       }
 
-      if(seriesOptions.showLine) {
-        var line = seriesElement.elem('path', {
+      if (seriesOptions.showLine) {
+        let line = seriesElement.elem('path', {
           d: path.stringify()
         }, options.classNames.line, true);
 
@@ -255,26 +252,26 @@
       }
 
       // Area currently only works with axes that support a range!
-      if(seriesOptions.showArea && axisY.range) {
+      if (seriesOptions.showArea && axisY.range) {
         // If areaBase is outside the chart area (< min or > max) we need to set it respectively so that
         // the area is not drawn outside the chart area.
-        var areaBase = Math.max(Math.min(seriesOptions.areaBase, axisY.range.max), axisY.range.min);
+        let areaBase = Math.max(Math.min(seriesOptions.areaBase, axisY.range.max), axisY.range.min);
 
         // We project the areaBase value into screen coordinates
-        var areaBaseProjected = chartRect.y1 - axisY.projectValue(areaBase);
+        let areaBaseProjected = chartRect.y1 - axisY.projectValue(areaBase);
 
-        // In order to form the area we'll first split the path by move commands so we can chunk it up into segments
+        // In order to form the area we'll first split the path by move commands, so we can chunk it up into segments
         path.splitByCommand('M').filter(function onlySolidSegments(pathSegment) {
-          // We filter only "solid" segments that contain more than one point. Otherwise there's no need for an area
+          // We filter only "solid" segments that contain more than one point. Otherwise, there's no need for an area
           return pathSegment.pathElements.length > 1;
         }).map(function convertToArea(solidPathSegments) {
           // Receiving the filtered solid path segments we can now convert those segments into fill areas
-          var firstElement = solidPathSegments.pathElements[0];
-          var lastElement = solidPathSegments.pathElements[solidPathSegments.pathElements.length - 1];
+          let firstElement = solidPathSegments.pathElements[0];
+          let lastElement = solidPathSegments.pathElements[solidPathSegments.pathElements.length - 1];
 
           // Cloning the solid path segment with closing option and removing the first move command from the clone
           // We then insert a new move that should start at the area base and draw a straight line up or down
-          // at the end of the path we add an additional straight line to the projected area base value
+          // at the end of the path we add extra straight line to the projected area base value
           // As the closing option is set our path will be automatically closed
           return solidPathSegments.clone(true)
             .position(0)
@@ -284,10 +281,10 @@
             .position(solidPathSegments.pathElements.length + 1)
             .line(lastElement.x, areaBaseProjected);
 
-        }).forEach(function createArea(areaPath) {
+        }).forEach((areaPath) => {
           // For each of our newly created area paths, we'll now create path elements by stringifying our path objects
           // and adding the created DOM elements to the correct series group
-          var area = seriesElement.elem('path', {
+          let area = seriesElement.elem('path', {
             d: areaPath.stringify()
           }, options.classNames.area, true);
 
@@ -305,9 +302,9 @@
             group: seriesElement,
             element: area
           });
-        }.bind(this));
+        });
       }
-    }.bind(this));
+    });
 
     this.eventEmitter.emit('created', {
       bounds: axisY.bounds,
@@ -331,7 +328,7 @@
    *
    * @example
    * // Create a simple line chart
-   * var data = {
+   * let data = {
    *   // A labels array that can contain any sort of values
    *   labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
    *   // Our series array that contains series objects or in this case series data arrays
@@ -341,7 +338,7 @@
    * };
    *
    * // As options we currently only set a static size of 300x200 px
-   * var options = {
+   * let options = {
    *   width: '300px',
    *   height: '200px'
    * };
@@ -352,7 +349,7 @@
    * @example
    * // Use specific interpolation function with configuration from the Chartist.Interpolation module
    *
-   * var chart = new Chartist.Line('.ct-chart', {
+   * let chart = new Chartist.Line('.ct-chart', {
    *   labels: [1, 2, 3, 4, 5],
    *   series: [
    *     [1, 1, 8, 1, 7]
@@ -366,7 +363,7 @@
    * @example
    * // Create a line chart with responsive options
    *
-   * var data = {
+   * let data = {
    *   // A labels array that can contain any sort of values
    *   labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
    *   // Our series array that contains series objects or in this case series data arrays
@@ -375,8 +372,8 @@
    *   ]
    * };
    *
-   * // In addition to the regular options we specify responsive option overrides that will override the default configutation based on the matching media queries.
-   * var responsiveOptions = [
+   * // In addition to the regular options we specify responsive option overrides that will override the default configuration based on the matching media queries.
+   * let responsiveOptions = [
    *   ['screen and (min-width: 641px) and (max-width: 1024px)', {
    *     showPoint: false,
    *     axisX: {
@@ -400,19 +397,16 @@
    * new Chartist.Line('.ct-chart', data, null, responsiveOptions);
    *
    */
-  function Line(query, data, options, responsiveOptions) {
-    Chartist.Line.super.constructor.call(this,
-      query,
-      data,
-      defaultOptions,
-      Chartist.extend({}, defaultOptions, options),
-      responsiveOptions);
+  constructor(query, data, options, responsiveOptions) {
+    super(query, data, {}, Chartist.extend({}, {}, options), responsiveOptions);
   }
 
   // Creating line chart type in Chartist namespace
-  Chartist.Line = Chartist.Base.extend({
-    constructor: Line,
-    createChart: createChart
-  });
+  // Line = Chartist.Base.extend({
+  //   constructor: Line,
+  //   createChart: createChart
+  // });
 
-}(this || global, Chartist));
+}
+
+export default Line;

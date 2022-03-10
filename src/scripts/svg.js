@@ -103,7 +103,7 @@ class Svg {
       }
     }
 
-    Object.keys(attributes).forEach(function (key) {
+    Object.keys(attributes).forEach((key) => {
       // If the attribute value is undefined we can skip this one
       if (attributes[key] === undefined) {
         return;
@@ -115,7 +115,7 @@ class Svg {
       } else {
         this._node.setAttribute(key, attributes[key]);
       }
-    }.bind(this));
+    });
 
     return this;
   }
@@ -467,7 +467,7 @@ class Svg {
 
         if (guided) {
           // If guided we take the value that was put aside in timeout and trigger the animation manually with a timeout
-          setTimeout(function () {
+          setTimeout(() => {
             // If beginElement fails we set the animated attribute to the end position and remove the animate element
             // This happens if the SMIL ElementTimeControl interface is not supported or any other problems occurred in
             // the browser. (Currently FF 34 does not support animate elements in foreignObjects)
@@ -480,7 +480,7 @@ class Svg {
               // Remove the animate element as it's no longer required
               animate.remove();
             }
-          }.bind(this), timeout);
+          }, timeout);
         }
 
         if (eventEmitter) {

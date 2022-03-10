@@ -258,7 +258,7 @@ class Interpolation {
    * @param {Object} options The options of the monotoneCubic factory function.
    * @return {Function}
    */
-  monotoneCubic = function (options) {
+  static monotoneCubic(options) {
     let defaultOptions = {
       fillHoles: false
     };

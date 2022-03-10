@@ -28,9 +28,9 @@ class FixedScaleAxis extends Axis {
 
     let highLow = options.highLow || Chartist.getHighLow(data, options, axisUnit.pos);
     this.divisor = options.divisor || 1;
-    this.ticks = options.ticks || Chartist.times(this.divisor).map(function (value, index) {
+    this.ticks = options.ticks || Chartist.times(this.divisor).map((value, index) => {
       return highLow.low + (highLow.high - highLow.low) / this.divisor * index;
-    }.bind(this));
+    });
     this.ticks.sort(function (a, b) {
       return a - b;
     });

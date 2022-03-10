@@ -83,7 +83,7 @@ class Path {
    *
    * @memberof Chartist.Svg.Path
    * @param {Number} count Number of path elements that should be removed from the current position.
-   * @return {Chartist.Svg.Path} The current path object for easy call chaining.
+   * @return {Path}The current path object for easy call chaining.
    */
   remove(count) {
     this.pathElements.splice(this.pos, count);
@@ -98,7 +98,7 @@ class Path {
    * @param {Number} y The y coordinate for the move element.
    * @param {Boolean} [relative] If set to true the move element will be created with relative coordinates (lowercase letter)
    * @param {*} [data] Any data that should be stored with the element object that will be accessible in pathElement
-   * @return {Chartist.Svg.Path} The current path object for easy call chaining.
+   * @return {Path}The current path object for easy call chaining.
    */
   move(x, y, relative, data) {
     this.element('M', {
@@ -116,7 +116,7 @@ class Path {
    * @param {Number} y The y coordinate for the line element.
    * @param {Boolean} [relative] If set to true the line element will be created with relative coordinates (lowercase letter)
    * @param {*} [data] Any data that should be stored with the element object that will be accessible in pathElement
-   * @return {Chartist.Svg.Path} The current path object for easy call chaining.
+   * @return {Path}The current path object for easy call chaining.
    */
   line(x, y, relative, data) {
     this.element('L', {
@@ -138,7 +138,7 @@ class Path {
    * @param {Number} y The y coordinate for the target point of the curve element.
    * @param {Boolean} [relative] If set to true the curve element will be created with relative coordinates (lowercase letter)
    * @param {*} [data] Any data that should be stored with the element object that will be accessible in pathElement
-   * @return {Chartist.Svg.Path} The current path object for easy call chaining.
+   * @return {Path}The current path object for easy call chaining.
    */
   curve(x1, y1, x2, y2, x, y, relative, data) {
     this.element('C', {
@@ -159,13 +159,13 @@ class Path {
    * @param {Number} rx The radius to be used for the x-axis of the arc.
    * @param {Number} ry The radius to be used for the y-axis of the arc.
    * @param {Number} xAr Defines the orientation of the arc
-   * @param {Number} lAf Large arc flag
+   * @param {Boolean} lAf Large arc flag
    * @param {Number} sf Sweep flag
    * @param {Number} x The x coordinate for the target point of the curve element.
    * @param {Number} y The y coordinate for the target point of the curve element.
    * @param {Boolean} [relative] If set to true the curve element will be created with relative coordinates (lowercase letter)
    * @param {*} [data] Any data that should be stored with the element object that will be accessible in pathElement
-   * @return {Chartist.Svg.Path} The current path object for easy call chaining.
+   * @return {Path}The current path object for easy call chaining.
    */
   arc(rx, ry, xAr, lAf, sf, x, y, relative, data) {
     this.element('A', {
@@ -185,7 +185,7 @@ class Path {
    *
    * @memberof Chartist.Svg.Path
    * @param {String} path Any SVG path that contains move (m), line (l) or curve (c) components.
-   * @return {Chartist.Svg.Path} The current path object for easy call chaining.
+   * @return {Path}The current path object for easy call chaining.
    */
   parse(path) {
     // Parsing the SVG path string into an array of arrays [['M', '10', '10'], ['L', '100', '100']]
@@ -256,7 +256,7 @@ class Path {
    * @memberof Chartist.Svg.Path
    * @param {Number} x The number which will be used to scale the x, x1 and x2 of all path elements.
    * @param {Number} y The number which will be used to scale the y, y1 and y2 of all path elements.
-   * @return {Chartist.Svg.Path} The current path object for easy call chaining.
+   * @return {Path}The current path object for easy call chaining.
    */
   scale(x, y) {
     this.forEachParam(this.pathElements, (pathElement, paramName) => {
@@ -271,7 +271,7 @@ class Path {
    * @memberof Chartist.Svg.Path
    * @param {Number} x The number which will be used to translate the x, x1 and x2 of all path elements.
    * @param {Number} y The number which will be used to translate the y, y1 and y2 of all path elements.
-   * @return {Chartist.Svg.Path} The current path object for easy call chaining.
+   * @return {Path}The current path object for easy call chaining.
    */
   translate(x, y) {
     this.forEachParam(this.pathElements, (pathElement, paramName) => {
@@ -290,7 +290,7 @@ class Path {
    *
    * @memberof Chartist.Svg.Path
    * @param {Function} transformFnc The callback function for the transformation. Check the signature in the function description.
-   * @return {Chartist.Svg.Path} The current path object for easy call chaining.
+   * @return {Path}The current path object for easy call chaining.
    */
   transform(transformFnc) {
     this.forEachParam(this.pathElements, (pathElement, paramName, pathElementIndex, paramIndex, pathElements) => {
