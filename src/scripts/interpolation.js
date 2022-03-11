@@ -5,6 +5,7 @@
  */
 
 import Chartist from './core';
+import Path from './svg-path';
 
 // noinspection JSUnusedGlobalSymbols
 class Interpolation {
@@ -32,7 +33,7 @@ class Interpolation {
     };
     options = Chartist.extend({}, defaultOptions, options);
     return function none(pathCoordinates, valueData) {
-      let path = new Chartist.Svg.Path();
+      let path = new Path(undefined, {});
       let hole = true;
 
       for (let i = 0; i < pathCoordinates.length; i += 2) {
@@ -81,7 +82,7 @@ class Interpolation {
    * @param {Object} options The options of the simple interpolation factory function.
    * @return {Function}
    */
-  simple = function (options) {
+  static simple(options) {
     let defaultOptions = {
       divisor: 2,
       fillHoles: false
@@ -91,7 +92,7 @@ class Interpolation {
     let d = 1 / Math.max(1, options.divisor);
 
     return function simple(pathCoordinates, valueData) {
-      let path = new Chartist.Svg.Path();
+      let path = new Path(undefined, {});
       let prevX = undefined, prevY = undefined, prevData;
 
       for (let i = 0; i < pathCoordinates.length; i += 2) {
@@ -152,7 +153,7 @@ class Interpolation {
    * @param {Object} options The options of the cardinal factory function.
    * @return {Function}
    */
-  cardinal(options) {
+  static cardinal(options) {
     let defaultOptions = {
       tension: 1,
       fillHoles: false
@@ -172,7 +173,7 @@ class Interpolation {
 
       if (!segments.length) {
         // If there were no segments return 'Chartist.Interpolation.none'
-        return Chartist.Interpolation.none()([]);
+        return Interpolation.none()([]);
       } else if (segments.length > 1) {
         // If the split resulted in more than one segment we need to interpolate each segment individually and join them
         // afterwards together into a single path.
@@ -182,7 +183,7 @@ class Interpolation {
           paths.push(cardinal(segment.pathCoordinates, segment.valueData));
         });
         // Join the segment path data into a single path and return
-        return Chartist.Svg.Path.join(paths);
+        return Path.join(paths, undefined, {});
       } else {
         // If there was only one segment we can proceed regularly by using pathCoordinates and valueData from the first
         // segment
@@ -191,10 +192,10 @@ class Interpolation {
 
         // If less than two points we need to fall back to no smoothing
         if (pathCoordinates.length <= 4) {
-          return Chartist.Interpolation.none()(pathCoordinates, valueData);
+          return Interpolation.none()(pathCoordinates, valueData);
         }
 
-        let path = new Chartist.Svg.Path().move(pathCoordinates[0], pathCoordinates[1], false, valueData[0]),
+        let path = new Path(undefined, {}).move(pathCoordinates[0], pathCoordinates[1], false, valueData[0]),
           z;
 
         for (let i = 0, iLen = pathCoordinates.length; iLen - 2 * !z > i; i += 2) {
@@ -278,7 +279,7 @@ class Interpolation {
 
       if (!segments.length) {
         // If there were no segments return 'Chartist.Interpolation.none'
-        return Chartist.Interpolation.none()([]);
+        return Interpolation.none()([]);
       } else if (segments.length > 1) {
         // If the split resulted in more than one segment we need to interpolate each segment individually and join them
         // afterwards together into a single path.
@@ -288,7 +289,7 @@ class Interpolation {
           paths.push(monotoneCubic(segment.pathCoordinates, segment.valueData));
         });
         // Join the segment path data into a single path and return
-        return Chartist.Svg.Path.join(paths);
+        return Path.join(paths, undefined, {});
       } else {
         // If there was only one segment we can proceed regularly by using pathCoordinates and valueData from the first
         // segment
@@ -297,7 +298,7 @@ class Interpolation {
 
         // If less than three points we need to fall back to no smoothing
         if (pathCoordinates.length <= 4) {
-          return Chartist.Interpolation.none()(pathCoordinates, valueData);
+          return Interpolation.none()(pathCoordinates, valueData);
         }
 
         let xs = [],
@@ -345,7 +346,7 @@ class Interpolation {
 
         // Now build a path from the slopes
 
-        path = new Chartist.Svg.Path().move(xs[0], ys[0], false, valueData[0]);
+        path = new Path(undefined, {}).move(xs[0], ys[0], false, valueData[0]);
 
         for (i = 0; i < n - 1; i++) {
           path.curve(
@@ -390,7 +391,7 @@ class Interpolation {
    * @param options
    * @returns {Function}
    */
-  step(options) {
+  static step(options) {
     let defaultOptions = {
       postpone: true,
       fillHoles: false
@@ -399,7 +400,7 @@ class Interpolation {
     options = Chartist.extend({}, defaultOptions, options);
 
     return function step(pathCoordinates, valueData) {
-      let path = new Chartist.Svg.Path();
+      let path = new Path(undefined, {});
 
       let prevX = undefined, prevY = undefined, prevData = undefined;
 

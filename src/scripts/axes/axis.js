@@ -41,8 +41,8 @@ class Axis {
 
   createGridAndLabels(gridGroup, labelGroup, useForeignObject, chartOptions, eventEmitter) {
     let axisOptions = chartOptions['axis' + this.units.pos.toUpperCase()];
-    let projectedValues = this.ticks.map(this.projectValue);
-    let labelValues = this.ticks.map(axisOptions.labelInterpolationFnc);
+    let projectedValues = this.ticks.map(this.projectValue.bind(this));
+    let labelValues = this.ticks.map(axisOptions.labelInterpolationFnc.bind(this));
 
     projectedValues.forEach((projectedValue, index) => {
       let labelOffset = {

@@ -16,7 +16,7 @@ class Bar extends Base {
    *
    * @memberof Bar
    */
-  defaultOptions = {
+  static defaultOptions = {
     // Options for X-Axis
     axisX: {
       // The offset of the chart drawing area to the border of the container
@@ -430,7 +430,7 @@ class Bar extends Base {
    *
    */
   constructor(query, data, options, responsiveOptions) {
-    super(query, data, {}, Chartist.extend({}, {}, options), responsiveOptions);
+    super(query, data, Bar.defaultOptions, Chartist.extend({}, Bar.defaultOptions, options), responsiveOptions);
   }
 
   // Creating bar chart type in Chartist namespace

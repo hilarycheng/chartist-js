@@ -358,7 +358,7 @@ class Path {
    * @return {Path}
    */
 
-  join(paths, close, options) {
+  static join(paths, close, options) {
     let joinedPath = new Path(close, options);
     for (let i = 0; i < paths.length; i++) {
       let path = paths[i];

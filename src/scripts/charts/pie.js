@@ -13,7 +13,7 @@ class Pie extends Base {
    *
    * @memberof Chartist.Pie
    */
-  defaultOptions = {
+  static defaultOptions = {
     // Specify a fixed width for the chart as a string (i.e. '100px' or '50%')
     width: undefined,
     // Specify a fixed height for the chart as a string (i.e. '100px' or '50%')
@@ -375,7 +375,7 @@ class Pie extends Base {
    * });
    */
   constructor(query, data, options, responsiveOptions) {
-    super(query, data, {}, Chartist.extend({}, {}, options))
+    super(query, data, Pie.defaultOptions, Chartist.extend({}, Pie.defaultOptions, options))
   }
 
   // Creating pie chart type in Chartist namespace

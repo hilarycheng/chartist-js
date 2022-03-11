@@ -6,7 +6,7 @@
 
 class Event {
 
-  EventEmitter() {
+  static EventEmitter() {
     let handlers = [];
 
     /**

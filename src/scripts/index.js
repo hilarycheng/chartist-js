@@ -10,8 +10,7 @@ import Line from "./charts/line";
 import Pie from "./charts/pie";
 import Event from "./event";
 
-export default {
-
+let Chartist = {
   ...Core,
   Interpolation,
   Svg,
@@ -21,3 +20,14 @@ export default {
   Event
 
 }
+
+export {
+  Interpolation,
+  Svg,
+  Bar,
+  Line,
+  Pie,
+  Event
+}
+
+export { Chartist as default }

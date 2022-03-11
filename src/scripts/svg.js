@@ -557,10 +557,10 @@ class Svg {
    * @param {String} feature The SVG 1.1 feature that should be checked for support.
    * @return {Boolean} True of false if the feature is supported or not
    */
-  isSupported = function (feature) {
+  static isSupported(feature) {
     // noinspection JSDeprecatedSymbols
     return document.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#' + feature, '1.1');
-  };
+  }
 
   /**
    * This Object contains some standard easing cubic Bézier curves. Then can be used with their name in the `Chartist.Svg.animate`. You can also extend the list and use your own name in the `animate` function. Click the show code button to see the available bezier functions.

@@ -6,7 +6,10 @@
 
 import Class from './class';
 import Chartist from './core';
+import Event from "./event";
+import Svg from "./svg";
 
+// noinspection JSUnusedGlobalSymbols,JSUnresolvedVariable
 class Base extends Class {
 
   // TODO: Currently we need to re-draw the chart on window resize. This is usually very bad and will affect performance.
@@ -85,6 +88,7 @@ class Base extends Class {
     return this;
   }
 
+  // noinspection JSUnusedGlobalSymbols
   /**
    * Use this function to un-register event handlers. If the handler function parameter is omitted all handlers for the given event will be un-registered.
    *
@@ -135,6 +139,17 @@ class Base extends Class {
     this.initializeTimeoutId = undefined;
   }
 
+  container;
+  data;
+  defaultOptions;
+  options;
+  responsiveOptions;
+  eventEmitter;
+  supportsForeignObject;
+  supportsAnimations;
+  resizeListener;
+  initializeTimeoutId;
+
   constructor(query, data, defaultOptions, options, responsiveOptions) {
     super();
     this.container = Chartist.querySelector(query);
@@ -144,9 +159,9 @@ class Base extends Class {
     this.defaultOptions = defaultOptions;
     this.options = options;
     this.responsiveOptions = responsiveOptions;
-    this.eventEmitter = Chartist.EventEmitter();
-    this.supportsForeignObject = Chartist.Svg.isSupported('Extensibility');
-    this.supportsAnimations = Chartist.Svg.isSupported('AnimationEventsAttribute');
+    this.eventEmitter = Event.EventEmitter();
+    this.supportsForeignObject = Svg.isSupported('Extensibility');
+    this.supportsAnimations = Svg.isSupported('AnimationEventsAttribute');
     this.resizeListener = () => {
       this.update();
     };
@@ -162,7 +177,9 @@ class Base extends Class {
 
     // Using event loop for first draw to make it possible to register event listeners in the same call stack where
     // the chart was created.
-    this.initializeTimeoutId = setTimeout(this.initialize, 0);
+    this.initializeTimeoutId = setTimeout(() => {
+      this.initialize()
+    }, 0);
   }
 
   createChart() {

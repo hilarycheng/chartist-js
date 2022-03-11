@@ -18,7 +18,7 @@ class Line extends Base {
    *
    * @memberof Chartist.Line
    */
-  defaultOptions = {
+  static defaultOptions = {
     // Options for X-Axis
     axisX: {
       // The offset of the labels to the chart area
@@ -402,7 +402,7 @@ class Line extends Base {
    *
    */
   constructor(query, data, options, responsiveOptions) {
-    super(query, data, {}, Chartist.extend({}, {}, options), responsiveOptions);
+    super(query, data, Line.defaultOptions, Chartist.extend({}, Line.defaultOptions, options), responsiveOptions);
   }
 
   // Creating line chart type in Chartist namespace
